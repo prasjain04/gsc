@@ -1,0 +1,90 @@
+[
+  {
+    "name": "Burnt Aubergine with Tahini",
+    "page_number": 24,
+    "course": "appetizer",
+    "allergens": ["nuts"],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Bridget Jones Hummus",
+    "page_number": 31,
+    "course": "appetizer",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Harissa Chicken with Preserved Lemon",
+    "page_number": 78,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": false,
+    "is_vegan": false
+  },
+  {
+    "name": "Lamb Kofta with Yogurt & Sumac",
+    "page_number": 98,
+    "course": "main",
+    "allergens": ["dairy"],
+    "is_vegetarian": false,
+    "is_vegan": false
+  },
+  {
+    "name": "Stuffed Peppers with Ricotta & Herbs",
+    "page_number": 112,
+    "course": "main",
+    "allergens": ["dairy", "gluten"],
+    "is_vegetarian": true,
+    "is_vegan": false
+  },
+  {
+    "name": "Roasted Cauliflower with Tahini & Pomegranate",
+    "page_number": 142,
+    "course": "side",
+    "allergens": ["nuts"],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Smashed Potatoes with Garlic Butter",
+    "page_number": 156,
+    "course": "side",
+    "allergens": ["dairy"],
+    "is_vegetarian": true,
+    "is_vegan": false
+  },
+  {
+    "name": "Green Bean Salad with Mustard Seeds",
+    "page_number": 161,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Honey & Pistachio Semifreddo",
+    "page_number": 210,
+    "course": "dessert",
+    "allergens": ["dairy", "eggs", "nuts"],
+    "is_vegetarian": true,
+    "is_vegan": false
+  },
+  {
+    "name": "Chocolate & Olive Oil Mousse",
+    "page_number": 224,
+    "course": "dessert",
+    "allergens": ["dairy", "eggs"],
+    "is_vegetarian": true,
+    "is_vegan": false
+  },
+  {
+    "name": "Rose Water & Cardamom Panna Cotta",
+    "page_number": 232,
+    "course": "dessert",
+    "allergens": ["dairy"],
+    "is_vegetarian": true,
+    "is_vegan": false
+  }
+]
