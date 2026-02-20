@@ -161,17 +161,9 @@ export default function InviteCard({
             </p>
             <p className="font-body text-sm" style={{ color: 'var(--ink)', opacity: 0.6 }}>
               {responded === 'accepted'
-                ? 'Please sign up to pick your recipe →'
+                ? 'Taking you to your account...'
                 : 'Hope to see you at the next one ♡'}
             </p>
-            {responded === 'accepted' && (
-              <button
-                onClick={onSignIn}
-                className="btn-elegant-accent mt-4 text-xs"
-              >
-                Create Account
-              </button>
-            )}
           </motion.div>
         ) : (
           <>

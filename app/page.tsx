@@ -60,6 +60,23 @@ export default function HomePage() {
     sessionStorage.setItem('rsvp_name', name);
     sessionStorage.setItem('rsvp_status', 'attending');
     sessionStorage.setItem('rsvp_event_id', event?.id || '');
+
+    // Check if a user with this name already exists
+    const supabase = createBrowserSupabase();
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('id, name')
+      .ilike('name', name.trim())
+      .limit(1)
+      .maybeSingle();
+
+    if (existingProfile) {
+      // Existing user — go to sign in
+      router.push('/auth/login');
+    } else {
+      // New user — go to create account
+      router.push('/auth/signup');
+    }
   };
 
   const handleDecline = async (name: string) => {
