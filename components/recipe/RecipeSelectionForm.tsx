@@ -113,17 +113,34 @@ export default function RecipeSelectionForm({
                                     {currentDishName}
                                 </p>
                             </div>
-                            <button
-                                onClick={() => setIsOpen(true)}
-                                className="text-xs font-body py-1.5 px-4 rounded-full transition-all"
-                                style={{
-                                    border: '1.5px solid var(--accent)',
-                                    color: 'var(--accent)',
-                                    background: 'transparent',
-                                }}
-                            >
-                                Change
-                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => {
+                                        if (currentClaim?.claimId) {
+                                            onUnclaim(currentClaim.claimId);
+                                        }
+                                    }}
+                                    className="text-xs font-body py-1.5 px-3 rounded-full transition-all"
+                                    style={{
+                                        border: '1.5px solid var(--accent-warm)',
+                                        color: 'var(--accent-warm)',
+                                        background: 'transparent',
+                                    }}
+                                >
+                                    Still thinking
+                                </button>
+                                <button
+                                    onClick={() => setIsOpen(true)}
+                                    className="text-xs font-body py-1.5 px-3 rounded-full transition-all"
+                                    style={{
+                                        border: '1.5px solid var(--accent)',
+                                        color: 'var(--accent)',
+                                        background: 'transparent',
+                                    }}
+                                >
+                                    Change
+                                </button>
+                            </div>
                         </div>
                     ) : (
                         <button

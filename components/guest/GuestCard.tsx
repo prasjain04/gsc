@@ -106,7 +106,7 @@ export default function GuestCard({ guest, isCurrentUser, onSelectDish }: GuestC
             ) : (
                 <div>
                     <p className="font-body text-xs italic" style={{ color: 'var(--accent-warm)' }}>
-                        Hasn't picked yet 👀
+                        Hasn't picked yet 💭
                     </p>
                     {isCurrentUser && onSelectDish && (
                         <button
