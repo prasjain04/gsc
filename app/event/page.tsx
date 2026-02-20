@@ -361,9 +361,25 @@ export default function EventPage() {
 
             {/* Cookbook cover image */}
             {cookbook?.cover_url && (
-              <div className="cookbook-cover">
-                <img src={cookbook.cover_url} alt={cookbook.name} />
-              </div>
+              <a
+                href="https://drive.google.com/file/d/1jhak8Njmp9kDRDU4DGKDEm_cXAm7M7VH/view?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block group"
+              >
+                <div className="cookbook-cover relative overflow-hidden" style={{ cursor: 'pointer' }}>
+                  <img
+                    src={cookbook.cover_url}
+                    alt={cookbook.name}
+                    className="transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                </div>
+                <p className="text-center font-body text-xs mt-2 transition-opacity group-hover:opacity-100"
+                  style={{ color: 'var(--accent)' }}>
+                  Tap to view cookbook →
+                </p>
+              </a>
             )}
 
             {/* Cookbook placeholder if no cover */}
