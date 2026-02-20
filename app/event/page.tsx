@@ -22,6 +22,8 @@ export default function EventPage() {
   const [recipes, setRecipes] = useState<RecipeWithClaim[]>([]);
   const [suggestions, setSuggestions] = useState<ClaimWithDetails[]>([]);
   const [guests, setGuests] = useState<GuestInfo[]>([]);
+  const [declinedGuests, setDeclinedGuests] = useState<{ profile: Profile }[]>([]);
+  const [userRsvpStatus, setUserRsvpStatus] = useState<'attending' | 'declined'>('attending');
   const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async () => {
@@ -97,22 +99,36 @@ export default function EventPage() {
     setRecipes(recipesWithClaims);
     setSuggestions(suggestionsList);
 
-    // Get RSVPs + profiles for guest cards
+    // Get ALL RSVPs + profiles (attending AND declined)
     const { data: rsvpsData } = await supabase
       .from('rsvps')
       .select('*, profile:profiles(*)')
-      .eq('event_id', eventData.id)
-      .eq('status', 'attending');
+      .eq('event_id', eventData.id);
 
-    const guestList: GuestInfo[] = (rsvpsData || []).map((r: any) => ({
+    // Split attending vs declined
+    const attendingRsvps = (rsvpsData || []).filter((r: any) => r.status === 'attending');
+    const declinedRsvps = (rsvpsData || []).filter((r: any) => r.status === 'declined');
+
+    // Set current user's RSVP status
+    const userRsvp = (rsvpsData || []).find((r: any) => r.user_id === user.id);
+    if (userRsvp) {
+      setUserRsvpStatus(userRsvp.status);
+    }
+
+    const guestList: GuestInfo[] = attendingRsvps.map((r: any) => ({
       profile: r.profile,
       rsvp: r,
       claim: (claimsData || []).find((c: any) => c.user_id === r.user_id),
     }));
 
+    const declinedList = declinedRsvps.map((r: any) => ({
+      profile: r.profile,
+    }));
+
     // If the current user has no RSVP for this event, create one automatically
     const currentUserInList = guestList.some(g => g.profile.id === user.id);
-    if (!currentUserInList && profileData) {
+    const currentUserDeclined = declinedList.some(g => g.profile.id === user.id);
+    if (!currentUserInList && !currentUserDeclined && profileData) {
       // Auto-create RSVP
       await supabase.from('rsvps').upsert({
         event_id: eventData.id,
@@ -129,6 +145,7 @@ export default function EventPage() {
     }
 
     setGuests(guestList);
+    setDeclinedGuests(declinedList);
     setLoading(false);
   }, [router]);
 
@@ -156,6 +173,26 @@ export default function EventPage() {
   const handleUnclaim = async (claimId: string) => {
     const supabase = createBrowserSupabase();
     await supabase.from('claims').delete().eq('id', claimId);
+    loadData();
+  };
+
+  const handleToggleRsvp = async () => {
+    if (!userId || !event) return;
+    const supabase = createBrowserSupabase();
+    const newStatus = userRsvpStatus === 'attending' ? 'declined' : 'attending';
+
+    await supabase.from('rsvps').upsert({
+      event_id: event.id,
+      user_id: userId,
+      status: newStatus,
+    }, { onConflict: 'event_id,user_id' });
+
+    // If declining, also remove any claims
+    if (newStatus === 'declined') {
+      await supabase.from('claims').delete().eq('event_id', event.id).eq('user_id', userId);
+    }
+
+    setUserRsvpStatus(newStatus);
     loadData();
   };
 
@@ -289,6 +326,37 @@ export default function EventPage() {
                   </button>
                 </div>
               )}
+
+              {/* RSVP toggle */}
+              <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(212, 184, 150, 0.2)' }}>
+                <p className="font-body text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--accent-warm)' }}>
+                  Your RSVP
+                </p>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleToggleRsvp}
+                    className="flex items-center gap-2 py-1.5 px-4 rounded-full text-xs font-body transition-all"
+                    style={{
+                      background: userRsvpStatus === 'attending' ? 'var(--accent)' : 'transparent',
+                      color: userRsvpStatus === 'attending' ? 'var(--surface)' : 'var(--accent-warm)',
+                      border: `1.5px solid ${userRsvpStatus === 'attending' ? 'var(--accent)' : 'var(--accent-warm)'}`,
+                    }}
+                  >
+                    {userRsvpStatus === 'attending' ? '✓ Attending' : 'Attend'}
+                  </button>
+                  <button
+                    onClick={handleToggleRsvp}
+                    className="flex items-center gap-2 py-1.5 px-4 rounded-full text-xs font-body transition-all"
+                    style={{
+                      background: userRsvpStatus === 'declined' ? 'var(--accent-warm)' : 'transparent',
+                      color: userRsvpStatus === 'declined' ? 'var(--surface)' : 'var(--accent-warm)',
+                      border: `1.5px solid var(--accent-warm)`,
+                    }}
+                  >
+                    {userRsvpStatus === 'declined' ? '✗ Can\'t make it' : 'Can\'t make it'}
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Cookbook cover image */}
@@ -345,6 +413,44 @@ export default function EventPage() {
                 />
               ))}
             </div>
+
+            {/* Declined guests section */}
+            {declinedGuests.length > 0 && (
+              <div className="mt-8 pt-6" style={{ borderTop: '1px solid rgba(212, 184, 150, 0.2)' }}>
+                <p className="font-display italic text-sm mb-3" style={{ color: 'var(--accent-warm)' }}>
+                  Can’t make it this time 💔
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {declinedGuests.map(g => (
+                    <div
+                      key={g.profile.id}
+                      className="flex items-center gap-2 py-1.5 px-3 rounded-full"
+                      style={{
+                        background: 'rgba(212, 184, 150, 0.1)',
+                        border: '1px solid rgba(212, 184, 150, 0.2)',
+                      }}
+                    >
+                      <div
+                        className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0"
+                        style={{ background: 'var(--surface)', border: '1px solid var(--accent-warm)' }}
+                      >
+                        {g.profile.avatar_url ? (
+                          <img src={g.profile.avatar_url} alt={g.profile.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center font-display italic text-[10px]"
+                            style={{ color: 'var(--accent-warm)' }}>
+                            {g.profile.name?.charAt(0) || '?'}
+                          </div>
+                        )}
+                      </div>
+                      <span className="font-body text-xs" style={{ color: 'var(--accent-warm)' }}>
+                        {g.profile.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
           </div>
         </div>
