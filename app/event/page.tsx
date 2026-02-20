@@ -110,9 +110,16 @@ export default function EventPage() {
       claim: (claimsData || []).find((c: any) => c.user_id === r.user_id),
     }));
 
-    // Ensure the current user is always in the guest list (even without RSVP)
+    // If the current user has no RSVP for this event, create one automatically
     const currentUserInList = guestList.some(g => g.profile.id === user.id);
     if (!currentUserInList && profileData) {
+      // Auto-create RSVP
+      await supabase.from('rsvps').upsert({
+        event_id: eventData.id,
+        user_id: user.id,
+        status: 'attending',
+      }, { onConflict: 'event_id,user_id' });
+
       const userClaim = (claimsData || []).find((c: any) => c.user_id === user.id);
       guestList.unshift({
         profile: profileData,
