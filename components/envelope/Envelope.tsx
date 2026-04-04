@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useAnimation } from 'framer-motion';
-import { useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 interface EnvelopeProps {
   children: React.ReactNode;
@@ -9,170 +9,144 @@ interface EnvelopeProps {
 }
 
 export default function Envelope({ children, onOpen }: EnvelopeProps) {
-  const [phase, setPhase] = useState<'closed' | 'flap-open' | 'sliding' | 'done'>('closed');
+  const [isOpen, setIsOpen] = useState(false);
   const flapControls = useAnimation();
-  const cardControls = useAnimation();
-  const envelopeControls = useAnimation();
-  const cardRef = useRef<HTMLDivElement>(null);
+  const letterControls = useAnimation();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      openEnvelope();
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   const openEnvelope = async () => {
-    if (phase !== 'closed') return;
+    if (isOpen) return;
+    setIsOpen(true);
 
-    // Step 1: Flap opens
-    setPhase('flap-open');
+    // Flap opens
     await flapControls.start({
-      rotateX: 180,
-      transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] },
+      rotateX: -180,
+      transition: {
+        type: 'spring',
+        stiffness: 80,
+        damping: 15,
+        duration: 0.8,
+      },
     });
 
-    // Step 2: One continuous motion — card rises while envelope fades
-    setPhase('sliding');
-
-    envelopeControls.start({
-      opacity: 0,
-      transition: { duration: 0.4, ease: 'easeOut', delay: 0.15 },
+    // Letter slides up
+    letterControls.start({
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      transition: {
+        type: 'spring',
+        stiffness: 120,
+        damping: 20,
+        delay: 0,
+      },
     });
 
-    // Single fluid slide all the way to center
-    await cardControls.start({
-      y: -260,
-      transition: { duration: 1.2, ease: [0.22, 1, 0.36, 1] },
-    });
-
-    setPhase('done');
     onOpen?.();
   };
 
-  // ── DONE: card in normal centered layout — instant swap, no motion wrapper ──
-  if (phase === 'done') {
-    return (
-      <div className="flex items-center justify-center min-h-screen px-4">
-        <div className="w-full max-w-[380px]">
-          {children}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div
-      className="flex items-center justify-center min-h-screen px-4"
-      onClick={() => phase === 'closed' && openEnvelope()}
-      style={{
-        cursor: phase === 'closed' ? 'pointer' : 'default',
-        overflow: 'hidden',
-      }}
+      className="relative flex items-center justify-center min-h-screen px-4"
+      onClick={openEnvelope}
+      style={{ cursor: isOpen ? 'default' : 'pointer' }}
     >
-      <div className="relative w-full max-w-[380px]" style={{ height: '280px' }}>
-
-        <div
-          className="absolute inset-x-[4%]"
-          style={{
-            top: '-460px',
-            height: '480px',
-            overflow: 'hidden',
-            zIndex: 30,
-          }}
-        >
-          <motion.div
-            animate={cardControls}
-            initial={{ y: 460 }}
-            className="absolute bottom-0 inset-x-0"
-            style={{ willChange: 'transform' }}
-          >
-            <div style={{
-              opacity: phase === 'closed' ? 0 : 1,
-              transition: 'opacity 0.3s ease',
-            }}>
-              {children}
-            </div>
-          </motion.div>
-        </div>
-
-        {/* ── ENVELOPE ── */}
+      <div className="relative w-full max-w-[420px]">
+        {/* Letter that slides up */}
         <motion.div
-          className="absolute inset-0"
-          animate={envelopeControls}
-          initial={{ opacity: 1 }}
-          style={{ zIndex: 10, willChange: 'opacity' }}
+          animate={letterControls}
+          initial={{ y: 60, opacity: 0, scale: 0.95 }}
+          className="relative z-10"
         >
-          <div className="absolute inset-0" style={{
-            background: '#E8E0D4',
-            borderRadius: '4px 4px 8px 8px',
-            boxShadow: '0 8px 30px rgba(0,0,0,0.10)',
-          }} />
+          {children}
+        </motion.div>
 
-          <div className="absolute inset-x-0 top-0" style={{
-            height: '55%', background: '#F5F0E8',
-            clipPath: 'polygon(0 0, 50% 80%, 100% 0)',
-          }} />
+        {/* Envelope body */}
+        <motion.div
+          className="absolute inset-x-0 bottom-0 z-20 pointer-events-none"
+          style={{ height: '55%' }}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: isOpen ? 0 : 1 }}
+          transition={{ delay: 0.6, duration: 0.4 }}
+        >
+          {/* Envelope back */}
+          <div
+            className="absolute inset-0 rounded-b-lg"
+            style={{
+              background: 'linear-gradient(180deg, #E8E0D4 0%, #DDD5C8 100%)',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+            }}
+          />
 
-          <div className="absolute top-0 left-0 bottom-0" style={{
-            width: '12%', background: 'linear-gradient(90deg, #DFD7CB, #E8E0D4)',
-            clipPath: 'polygon(0 0, 100% 12%, 100% 88%, 0 100%)', borderRadius: '4px 0 0 8px',
-          }} />
+          {/* Envelope front fold */}
+          <div
+            className="absolute inset-0 rounded-b-lg"
+            style={{
+              background: 'linear-gradient(180deg, #F0E8DC 0%, #E8E0D4 100%)',
+              clipPath: 'polygon(0 0, 50% 60%, 100% 0, 100% 100%, 0 100%)',
+            }}
+          />
+        </motion.div>
 
-          <div className="absolute top-0 right-0 bottom-0" style={{
-            width: '12%', background: 'linear-gradient(270deg, #DFD7CB, #E8E0D4)',
-            clipPath: 'polygon(0 12%, 100% 0, 100% 100%, 0 88%)', borderRadius: '0 4px 8px 0',
-          }} />
-
-          <div className="absolute inset-0" style={{
-            background: 'linear-gradient(180deg, #F0E8DC 0%, #E8E0D4 100%)',
-            clipPath: 'polygon(0 0, 50% 45%, 100% 0, 100% 100%, 0 100%)',
-            borderRadius: '0 0 8px 8px',
-          }} />
-
-          <div className="absolute bottom-0 inset-x-0" style={{
-            height: '18%', background: 'linear-gradient(0deg, #E0D8CC, transparent)',
-            borderRadius: '0 0 8px 8px',
-          }} />
-
-          {/* Flap */}
-          <motion.div
-            className="absolute inset-x-0 top-0"
-            style={{ height: '55%', transformOrigin: 'top center', perspective: '600px', zIndex: 35, willChange: 'transform' }}
-            animate={flapControls}
-            initial={{ rotateX: 0 }}
-          >
-            <div className="w-full h-full" style={{
-              background: 'linear-gradient(180deg, #EDE6DA 0%, #E4DCD0 100%)',
+        {/* Envelope flap */}
+        <motion.div
+          className="absolute inset-x-0 z-30 pointer-events-none"
+          style={{
+            top: '40%',
+            height: '35%',
+            transformOrigin: 'top center',
+            perspective: '800px',
+          }}
+          animate={flapControls}
+          initial={{ rotateX: 0 }}
+        >
+          <div
+            className="w-full h-full"
+            style={{
+              background: 'linear-gradient(180deg, #E8E0D4 0%, #DDD5C8 50%)',
               clipPath: 'polygon(0 0, 50% 100%, 100% 0)',
-              backfaceVisibility: 'hidden',
-            }} />
-          </motion.div>
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            }}
+          />
+        </motion.div>
 
-          {/* Wax seal */}
-          <motion.div
-            className="absolute pointer-events-none"
-            style={{ left: '43%', top: '45%', transform: 'translate(-50%, -50%)', zIndex: 36 }}
-            animate={{ opacity: phase === 'closed' ? 1 : 0, scale: phase === 'closed' ? 1 : 0.5 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
+        {/* Decorative seal */}
+        <motion.div
+          className="absolute z-40 pointer-events-none"
+          style={{
+            top: '48%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+          }}
+          initial={{ opacity: 1, scale: 1 }}
+          animate={{ opacity: isOpen ? 0 : 1, scale: isOpen ? 0.5 : 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center"
+            style={{
+              background: 'var(--accent)',
+              boxShadow: '0 2px 8px rgba(196, 71, 58, 0.3)',
+            }}
           >
-            <div className="relative w-14 h-14 flex items-center justify-center">
-              <div className="absolute inset-0" style={{
-                background: 'radial-gradient(circle at 40% 35%, #D4564A 0%, #B8443A 40%, #9C3830 100%)',
-                borderRadius: '47% 53% 52% 48% / 49% 45% 55% 51%',
-                boxShadow: '0 3px 8px rgba(156, 56, 48, 0.4), inset 0 1px 2px rgba(255,255,255,0.15)',
-              }} />
-              <div className="absolute" style={{
-                inset: '6px', border: '1.5px solid rgba(255,255,255,0.2)', borderRadius: '50%',
-              }} />
-              <span className="relative text-white text-xs font-display italic" style={{
-                textShadow: '0 1px 2px rgba(0,0,0,0.3)', letterSpacing: '0.5px',
-              }}>GSC</span>
-            </div>
-          </motion.div>
+            <span className="text-white text-xs font-display italic">GSC</span>
+          </div>
         </motion.div>
 
         {/* Tap hint */}
-        {phase === 'closed' && (
+        {!isOpen && (
           <motion.p
-            className="absolute left-0 right-0 text-center text-sm font-body"
-            style={{ bottom: '-40px', color: 'var(--accent-warm)' }}
+            className="absolute -bottom-12 left-0 right-0 text-center text-sm font-body"
+            style={{ color: 'var(--accent-warm)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 0.6, 0] }}
-            transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 0.5, ease: 'easeInOut' }}
+            transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
           >
             tap to open
           </motion.p>

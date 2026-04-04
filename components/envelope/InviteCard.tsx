@@ -4,12 +4,10 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 
 interface InviteCardProps {
-  volumeNumber: string;
-  dateFormatted: string;
+  volumeNumber: string; // e.g. "Vol. I"
+  dateFormatted: string; // e.g. "Saturday, the 22nd of March"
   cookbookName: string;
   cookbookCoverUrl?: string | null;
-  eventTime?: string | null;
-  eventLocation?: string | null;
   onAccept: (name: string) => void;
   onDecline: (name: string) => void;
   onSignIn: () => void;
@@ -20,8 +18,6 @@ export default function InviteCard({
   dateFormatted,
   cookbookName,
   cookbookCoverUrl,
-  eventTime,
-  eventLocation,
   onAccept,
   onDecline,
   onSignIn,
@@ -112,22 +108,6 @@ export default function InviteCard({
           {dateFormatted}
         </p>
 
-        {/* Time & Location */}
-        {(eventTime || eventLocation) && (
-          <div className="mb-6 space-y-1">
-            {eventTime && (
-              <p className="font-body text-xs" style={{ color: 'var(--ink)', opacity: 0.6 }}>
-                {eventTime}
-              </p>
-            )}
-            {eventLocation && (
-              <p className="font-body text-xs" style={{ color: 'var(--ink)', opacity: 0.6 }}>
-                📍 {eventLocation}
-              </p>
-            )}
-          </div>
-        )}
-
         {/* Cookbook */}
         <div className="mb-6">
           {cookbookCoverUrl && (
@@ -161,9 +141,17 @@ export default function InviteCard({
             </p>
             <p className="font-body text-sm" style={{ color: 'var(--ink)', opacity: 0.6 }}>
               {responded === 'accepted'
-                ? 'Taking you to your account...'
+                ? 'Please sign up to pick your recipe →'
                 : 'Hope to see you at the next one ♡'}
             </p>
+            {responded === 'accepted' && (
+              <button
+                onClick={onSignIn}
+                className="btn-elegant-accent mt-4 text-xs"
+              >
+                Create Account
+              </button>
+            )}
           </motion.div>
         ) : (
           <>
