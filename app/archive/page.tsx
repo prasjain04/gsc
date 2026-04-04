@@ -18,38 +18,29 @@ export default function ArchivePage() {
   const loadArchive = async () => {
     const supabase = createBrowserSupabase();
 
-    // Get past events (date has passed)
-    const { data: eventsData, error } = await supabase
+    // Get past events (archived ones)
+    const { data: eventsData } = await supabase
       .from('events')
-      .select('*, cookbook:cookbooks!events_cookbook_id_fkey(*)')
-      .lt('date', new Date().toISOString().split('T')[0])
+      .select('*')
+      .eq('is_active', false)
       .order('date', { ascending: false });
 
-    if (error) {
-      console.error('Archive query error:', error);
-      // Fallback: try without join
-      const { data: fallbackData } = await supabase
-        .from('events')
-        .select('*')
-        .lt('date', new Date().toISOString().split('T')[0])
-        .order('date', { ascending: false });
-
-      if (fallbackData && fallbackData.length > 0) {
-        // Fetch cookbooks separately
-        const enriched = await Promise.all(fallbackData.map(async (event) => {
-          const { data: cookbookData } = await supabase
-            .from('cookbooks')
-            .select('*')
-            .eq('event_id', event.id)
-            .single();
-          return { ...event, cookbook: cookbookData };
-        }));
-        setEvents(enriched);
-      }
-    } else {
-      setEvents(eventsData || []);
+    if (!eventsData || eventsData.length === 0) {
+      setLoading(false);
+      return;
     }
 
+    // Fetch cookbooks separately (joined via cookbooks.event_id)
+    const enriched = await Promise.all(eventsData.map(async (event) => {
+      const { data: cookbookData } = await supabase
+        .from('cookbooks')
+        .select('*')
+        .eq('event_id', event.id)
+        .single();
+      return { ...event, cookbook: cookbookData };
+    }));
+
+    setEvents(enriched);
     setLoading(false);
   };
 
