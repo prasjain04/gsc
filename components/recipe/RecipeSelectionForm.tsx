@@ -3,14 +3,18 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ALLERGEN_EMOJI, COURSE_ORDER, COURSE_LABELS, COURSE_QUOTAS } from '@/lib/types';
-import type { RecipeWithClaim, Recipe, Allergen, Course } from '@/lib/types';
+import type { RecipeWithClaim, Recipe, Allergen, Course, Profile } from '@/lib/types';
 
 interface RecipeSelectionFormProps {
     recipes: RecipeWithClaim[];
     currentClaim?: { claimId: string; recipe?: Recipe; isSuggestion?: boolean; suggestionName?: string } | null;
     isLocked: boolean;
+    currentCourse: Course | null;
+    currentPartners: string[];
+    allProfiles: Profile[];
+    userId: string | null;
     courseCounts: Record<Course, number>;
-    onClaim: (recipeId: string) => void;
+    onClaim: (recipeId: string, course: Course, partnerIds: string[]) => void;
     onUnclaim: (claimId: string) => void;
 }
 
@@ -18,6 +22,10 @@ export default function RecipeSelectionForm({
     recipes,
     currentClaim,
     isLocked,
+    currentCourse,
+    currentPartners,
+    allProfiles,
+    userId,
     courseCounts,
     onClaim,
     onUnclaim,
@@ -25,6 +33,21 @@ export default function RecipeSelectionForm({
     const [isOpen, setIsOpen] = useState(false);
     const [selectedRecipeId, setSelectedRecipeId] = useState<string>('');
     const [allergensAcknowledged, setAllergensAcknowledged] = useState(false);
+
+    // Internal state for RSVP fields tied to this claim
+    const [selectedCourse, setSelectedCourse] = useState<Course | null>(currentCourse);
+    const [selectedPartners, setSelectedPartners] = useState<string[]>(currentPartners);
+    const [showPartnerDropdown, setShowPartnerDropdown] = useState(false);
+
+    const togglePartner = (pid: string) => {
+        if (selectedPartners.includes(pid)) {
+            setSelectedPartners(selectedPartners.filter(p => p !== pid));
+        } else if (selectedPartners.length < 2) {
+            setSelectedPartners([...selectedPartners, pid]);
+        }
+    };
+
+    const partnerProfiles = allProfiles?.filter(p => p.id !== userId) || [];
 
     // Find the selected recipe from the list
     const selectedRecipe = useMemo(
@@ -54,14 +77,14 @@ export default function RecipeSelectionForm({
     };
 
     const handleConfirm = () => {
-        if (!selectedRecipeId || !allergensAcknowledged) return;
+        if (!selectedRecipeId || !allergensAcknowledged || !selectedCourse) return;
 
         // If user already has a claim, unclaim first
         if (currentClaim?.claimId) {
             onUnclaim(currentClaim.claimId);
         }
 
-        onClaim(selectedRecipeId);
+        onClaim(selectedRecipeId, selectedCourse, selectedPartners);
         setIsOpen(false);
         setSelectedRecipeId('');
         setAllergensAcknowledged(false);
@@ -268,7 +291,7 @@ export default function RecipeSelectionForm({
                         <div className="flex gap-2">
                             <button
                                 onClick={handleConfirm}
-                                disabled={!selectedRecipeId || !allergensAcknowledged}
+                                disabled={!selectedRecipeId || !allergensAcknowledged || !selectedCourse}
                                 className="btn-elegant-filled text-xs flex-1"
                                 style={{
                                     opacity: (!selectedRecipeId || !allergensAcknowledged) ? 0.4 : 1,

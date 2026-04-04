@@ -169,16 +169,39 @@ export default function EventPage() {
     loadData();
   }, [loadData]);
 
-  const handleClaim = async (recipeId: string) => {
+  const handleClaim = async (recipeId: string, course: Course, partnerIds: string[]) => {
     if (!userId || !event) return;
     const supabase = createBrowserSupabase();
 
-    // Find current user's RSVP to get partner_ids
-    const userRsvp = guests.find(g => g.profile.id === userId)?.rsvp;
-    const partners = userRsvp?.partner_ids || [];
-    const allUsers = [userId, ...partners];
+    // 1. Update the user's RSVP to include course & partners, and set to attending (in case they weren't somehow)
+    await supabase.from('rsvps').upsert({
+      event_id: event.id,
+      user_id: userId,
+      status: 'attending',
+      course_preference: course,
+      partner_ids: partnerIds,
+    }, { onConflict: 'event_id,user_id' });
 
-    // Remove any existing claim first for user and partners
+    // 2. Sync partner RSVPs
+    for (const pid of partnerIds) {
+      const { data: existing } = await supabase
+        .from('rsvps')
+        .select('*')
+        .eq('event_id', event.id)
+        .eq('user_id', pid)
+        .single();
+
+      await supabase.from('rsvps').upsert({
+        event_id: event.id,
+        user_id: pid,
+        status: 'attending',
+        course_preference: course,
+        partner_ids: existing?.partner_ids || [],
+      }, { onConflict: 'event_id,user_id' });
+    }
+
+    // 3. Sync claims
+    const allUsers = [userId, ...partnerIds];
     for (const uid of allUsers) {
       await supabase.from('claims').delete().eq('event_id', event.id).eq('user_id', uid);
       await supabase.from('claims').insert({
@@ -378,10 +401,6 @@ export default function EventPage() {
                   eventId={event.id}
                   userId={userId}
                   userRsvpStatus={userRsvpStatus}
-                  currentCourse={(guests.find(g => g.profile.id === userId)?.rsvp?.course_preference) || null}
-                  currentPartners={(guests.find(g => g.profile.id === userId)?.rsvp?.partner_ids) || []}
-                  allProfiles={allProfiles}
-                  courseCounts={courseCounts}
                   onComplete={loadData}
                 />
               )}
@@ -435,9 +454,13 @@ export default function EventPage() {
                 recipes={recipes}
                 currentClaim={currentUserClaim}
                 isLocked={isLocked}
+                currentCourse={(guests.find(g => g.profile.id === userId)?.rsvp?.course_preference) || null}
+                currentPartners={(guests.find(g => g.profile.id === userId)?.rsvp?.partner_ids) || []}
+                allProfiles={allProfiles}
+                courseCounts={courseCounts}
+                userId={userId}
                 onClaim={handleClaim}
                 onUnclaim={handleUnclaim}
-                courseCounts={courseCounts}
               />
             </div>
 
