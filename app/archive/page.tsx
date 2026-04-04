@@ -19,13 +19,37 @@ export default function ArchivePage() {
     const supabase = createBrowserSupabase();
 
     // Get past events (date has passed)
-    const { data: eventsData } = await supabase
+    const { data: eventsData, error } = await supabase
       .from('events')
-      .select('*, cookbook:cookbooks(*)')
+      .select('*, cookbook:cookbooks!events_cookbook_id_fkey(*)')
       .lt('date', new Date().toISOString().split('T')[0])
       .order('date', { ascending: false });
 
-    setEvents(eventsData || []);
+    if (error) {
+      console.error('Archive query error:', error);
+      // Fallback: try without join
+      const { data: fallbackData } = await supabase
+        .from('events')
+        .select('*')
+        .lt('date', new Date().toISOString().split('T')[0])
+        .order('date', { ascending: false });
+
+      if (fallbackData && fallbackData.length > 0) {
+        // Fetch cookbooks separately
+        const enriched = await Promise.all(fallbackData.map(async (event) => {
+          const { data: cookbookData } = await supabase
+            .from('cookbooks')
+            .select('*')
+            .eq('event_id', event.id)
+            .single();
+          return { ...event, cookbook: cookbookData };
+        }));
+        setEvents(enriched);
+      }
+    } else {
+      setEvents(eventsData || []);
+    }
+
     setLoading(false);
   };
 
