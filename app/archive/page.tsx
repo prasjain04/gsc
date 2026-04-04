@@ -25,13 +25,11 @@ export default function ArchivePage() {
       .eq('is_active', false)
       .order('date', { ascending: false });
 
-    if (!eventsData || eventsData.length === 0) {
-      setLoading(false);
-      return;
-    }
+    // Filter out Vol 1 from DB just in case it's there
+    const filteredEvents = (eventsData || []).filter(e => e.volume_number !== 1);
 
     // Fetch cookbooks separately (joined via cookbooks.event_id)
-    const enriched = await Promise.all(eventsData.map(async (event) => {
+    const enriched = await Promise.all(filteredEvents.map(async (event) => {
       const { data: cookbookData } = await supabase
         .from('cookbooks')
         .select('*')
@@ -40,7 +38,27 @@ export default function ArchivePage() {
       return { ...event, cookbook: cookbookData };
     }));
 
-    setEvents(enriched);
+    const HARDCODED_VOL1 = {
+      id: 'vol1',
+      title: 'Vol. 1',
+      volume_number: 1,
+      date: '2026-03-08',
+      cookbook_id: 'mock',
+      color_theme: null,
+      lock_time: null,
+      is_active: false,
+      created_at: '2026-03-01T00:00:00Z',
+      cookbook: {
+        id: 'mock',
+        name: 'The Chutney Life',
+        cover_url: 'https://m.media-amazon.com/images/I/81+L0WwK-RL._AC_UF1000,1000_QL80_.jpg',
+        pdf_url: 'https://drive.google.com/file/d/1jhak8Njmp9kDRDU4DGKDEm_cXAm7M7VH/view?usp=drive_link',
+        event_id: 'vol1',
+        created_at: '2026-03-01T00:00:00Z'
+      }
+    };
+
+    setEvents([...enriched, HARDCODED_VOL1 as any]);
     setLoading(false);
   };
 
