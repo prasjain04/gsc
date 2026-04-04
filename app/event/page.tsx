@@ -140,11 +140,11 @@ export default function EventPage() {
     const currentUserDeclined = declinedList.some(g => g.profile.id === user.id);
     if (!currentUserInList && !currentUserDeclined && profileData) {
       // Auto-create RSVP
-      await supabase.from('rsvps').upsert({
+      await supabase.from('rsvps').insert({
         event_id: eventData.id,
         user_id: user.id,
         status: 'attending',
-      }, { onConflict: 'event_id,user_id' });
+      });
 
       const userClaim = (claimsData || []).find((c: any) => c.user_id === user.id);
       guestList.unshift({
@@ -173,80 +173,48 @@ export default function EventPage() {
     if (!userId || !event) return;
     const supabase = createBrowserSupabase();
 
-    // 1. Clean up old claims — find old partners first
-    const { data: oldRsvp } = await supabase
+    // 1. Delete current user's old claim
+    await supabase.from('claims').delete().eq('event_id', event.id).eq('user_id', userId);
+
+    // 2. Read the existing RSVP to get its id
+    const { data: existingRsvp } = await supabase
       .from('rsvps')
-      .select('partner_ids')
+      .select('id')
       .eq('event_id', event.id)
       .eq('user_id', userId)
-      .single();
-    const oldPartnerIds: string[] = oldRsvp?.partner_ids || [];
-    const allOldUsers = [userId, ...oldPartnerIds];
-    for (const uid of allOldUsers) {
-      await supabase.from('claims').delete().eq('event_id', event.id).eq('user_id', uid);
-    }
+      .maybeSingle();
 
-    // 2. Update the user's RSVP with course & partners using explicit update
-    const { error: updateError } = await supabase
-      .from('rsvps')
-      .update({
-        status: 'attending',
-        course_preference: course,
-        partner_ids: partnerIds,
-      })
-      .eq('event_id', event.id)
-      .eq('user_id', userId);
-
-    if (updateError) {
-      console.error('RSVP update failed, trying insert:', updateError);
-      await supabase.from('rsvps').insert({
+    if (existingRsvp) {
+      // Update by primary key
+      const { error } = await supabase
+        .from('rsvps')
+        .update({
+          status: 'attending',
+          course_preference: course,
+          partner_ids: partnerIds,
+        })
+        .eq('id', existingRsvp.id);
+      if (error) console.error('RSVP update by id failed:', error);
+    } else {
+      // No RSVP yet — insert
+      const { error } = await supabase.from('rsvps').insert({
         event_id: event.id,
         user_id: userId,
         status: 'attending',
         course_preference: course,
         partner_ids: partnerIds,
       });
+      if (error) console.error('RSVP insert failed:', error);
     }
 
-    // 3. Create claims for user + partners
-    const allNewUsers = [userId, ...partnerIds];
-    for (const uid of allNewUsers) {
-      const { error: claimError } = await supabase.from('claims').insert({
-        event_id: event.id,
-        recipe_id: recipeId,
-        user_id: uid,
-        is_suggestion: false,
-      });
-      if (claimError) {
-        console.error(`Claim insert failed for ${uid}:`, claimError);
-      }
-    }
-
-    // 4. Try to sync partner RSVPs (may be limited by RLS for non-admin)
-    for (const pid of partnerIds) {
-      const { data: existing } = await supabase
-        .from('rsvps')
-        .select('partner_ids')
-        .eq('event_id', event.id)
-        .eq('user_id', pid)
-        .single();
-
-      if (existing) {
-        const existingPartners = existing.partner_ids || [];
-        const updatedPartners = existingPartners.includes(userId)
-          ? existingPartners
-          : [...existingPartners, userId];
-
-        await supabase
-          .from('rsvps')
-          .update({
-            course_preference: course,
-            partner_ids: updatedPartners,
-          })
-          .eq('event_id', event.id)
-          .eq('user_id', pid);
-      }
-    }
+    // 3. Create claim for current user only (unique index prevents per-recipe duplicates)
+    const { error: claimError } = await supabase.from('claims').insert({
+      event_id: event.id,
+      recipe_id: recipeId,
+      user_id: userId,
+      is_suggestion: false,
+    });
+    if (claimError) console.error('Claim insert failed:', claimError);
 
     await loadData();
   };

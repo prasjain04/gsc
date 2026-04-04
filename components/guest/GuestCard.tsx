@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { ALLERGEN_EMOJI, COURSE_LABELS } from '@/lib/types';
-import type { GuestInfo, Allergen, Profile } from '@/lib/types';
+import type { GuestInfo, Allergen, Profile, Course } from '@/lib/types';
 
 interface GuestCardProps {
     guest: GuestInfo;
@@ -15,33 +15,38 @@ interface GuestCardProps {
 export default function GuestCard({ guest, isCurrentUser, allProfiles = [], allGuests = [], onSelectDish }: GuestCardProps) {
     const { profile, claim, rsvp } = guest;
 
-    const recipeName = claim?.is_suggestion
-        ? claim.suggestion_name
-        : claim?.recipe?.name;
+    // If this guest has no claim, check if another guest listed them as a partner
+    // and inherit that guest's recipe info
+    let effectiveClaim = claim;
+    let pairedWith: GuestInfo | undefined;
+
+    if (!claim) {
+        // Find someone who listed this guest as their cooking partner
+        pairedWith = allGuests.find(
+            g => g.profile.id !== profile.id &&
+                g.rsvp?.partner_ids?.includes(profile.id) &&
+                g.claim
+        );
+        if (pairedWith) {
+            effectiveClaim = pairedWith.claim;
+        }
+    }
+
+    const recipeName = effectiveClaim?.is_suggestion
+        ? effectiveClaim.suggestion_name
+        : effectiveClaim?.recipe?.name;
 
     // Get allergens from the recipe or suggestion
-    const allergens: string[] = claim?.is_suggestion
-        ? (claim.suggestion_allergens || [])
-        : (claim?.recipe?.allergens || []);
+    const allergens: string[] = effectiveClaim?.is_suggestion
+        ? (effectiveClaim.suggestion_allergens || [])
+        : (effectiveClaim?.recipe?.allergens || []);
 
-    // Find cooking partners via multiple signals:
-    // 1. RSVP partner_ids (forward + reverse)
-    // 2. Other guests with claims for the same recipe
+    // Find cooking partner names
     const partnerNames: string[] = [];
-    // Debug: log partner data for troubleshooting
-    if (isCurrentUser && recipeName) {
-        console.log('[GuestCard debug]', {
-            name: profile.name,
-            rsvpPartnerIds: rsvp?.partner_ids,
-            claimRecipeId: claim?.recipe_id,
-            allGuestsCount: allGuests.length,
-            allProfilesCount: allProfiles.length,
-        });
-    }
     if (recipeName) {
         const partnerIdSet = new Set<string>();
 
-        // From RSVP partner_ids
+        // From this guest's RSVP partner_ids
         (rsvp?.partner_ids || []).forEach((pid: string) => partnerIdSet.add(pid));
 
         // Reverse: who listed this guest as their partner
@@ -51,14 +56,9 @@ export default function GuestCard({ guest, isCurrentUser, allProfiles = [], allG
             }
         });
 
-        // Same recipe claim: other guests who claimed the same recipe_id
-        const myRecipeId = claim?.recipe_id;
-        if (myRecipeId) {
-            allGuests.forEach(g => {
-                if (g.profile.id !== profile.id && g.claim?.recipe_id === myRecipeId) {
-                    partnerIdSet.add(g.profile.id);
-                }
-            });
+        // If this guest inherited a recipe from someone, that person is a partner
+        if (pairedWith) {
+            partnerIdSet.add(pairedWith.profile.id);
         }
 
         partnerIdSet.forEach(pid => {
@@ -134,10 +134,10 @@ export default function GuestCard({ guest, isCurrentUser, allProfiles = [], allG
                             with {partnerNames.join(' & ')}
                         </p>
                     )}
-                    {rsvp?.course_preference && (
+                    {(rsvp?.course_preference || effectiveClaim?.recipe?.course) && (
                         <div className="flex flex-wrap gap-2 mb-2 items-center">
                             <span className="text-[10px] uppercase font-body px-1.5 py-0.5 rounded" style={{ background: 'var(--accent)', color: 'var(--surface)' }}>
-                                {COURSE_LABELS[rsvp.course_preference]}
+                                {COURSE_LABELS[(rsvp?.course_preference || effectiveClaim?.recipe?.course) as Course]}
                             </span>
                         </div>
                     )}
