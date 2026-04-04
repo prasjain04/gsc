@@ -83,6 +83,8 @@ create table public.rsvps (
   event_id uuid references public.events on delete cascade not null,
   user_id uuid references public.profiles on delete cascade not null,
   status text not null check (status in ('attending', 'declined')),
+  course_preference text check (course_preference in ('appetizer', 'main', 'side', 'dessert')),
+  partner_ids uuid[] default '{}',
   created_at timestamptz default now(),
   unique(event_id, user_id)
 );

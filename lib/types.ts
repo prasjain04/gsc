@@ -57,6 +57,8 @@ export interface RSVP {
   event_id: string;
   user_id: string;
   status: RSVPStatus;
+  course_preference: Course | null;
+  partner_ids: string[];
   created_at: string;
 }
 
@@ -119,6 +121,13 @@ export const ALLERGEN_EMOJI: Record<Allergen, string> = {
 };
 
 export const COURSE_ORDER: Course[] = ['appetizer', 'main', 'side', 'dessert'];
+
+export const COURSE_QUOTAS: Record<Course, number> = {
+  appetizer: 3,
+  main: 3,
+  side: 3,
+  dessert: 1,
+};
 
 export const COURSE_LABELS: Record<Course, string> = {
   appetizer: 'Appetizers',

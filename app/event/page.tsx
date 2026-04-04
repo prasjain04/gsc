@@ -7,6 +7,7 @@ import { toRoman, formatInviteDate } from '@/lib/theme';
 import GuestCard from '@/components/guest/GuestCard';
 import RecipeSelectionForm from '@/components/recipe/RecipeSelectionForm';
 import { ALLERGEN_EMOJI } from '@/lib/types';
+import RSVPForm from '@/components/rsvp/RSVPForm';
 import type {
   Event, Cookbook, RecipeWithClaim, ClaimWithDetails,
   GuestInfo, Profile, Claim, Recipe, Course, Allergen,
@@ -22,6 +23,7 @@ export default function EventPage() {
   const [recipes, setRecipes] = useState<RecipeWithClaim[]>([]);
   const [suggestions, setSuggestions] = useState<ClaimWithDetails[]>([]);
   const [guests, setGuests] = useState<GuestInfo[]>([]);
+  const [allProfiles, setAllProfiles] = useState<Profile[]>([]);
   const [declinedGuests, setDeclinedGuests] = useState<{ profile: Profile }[]>([]);
   const [userRsvpStatus, setUserRsvpStatus] = useState<'attending' | 'declined'>('attending');
   const [loading, setLoading] = useState(true);
@@ -157,22 +159,44 @@ export default function EventPage() {
     if (!userId || !event) return;
     const supabase = createBrowserSupabase();
 
-    // Remove any existing claim first
-    await supabase.from('claims').delete().eq('event_id', event.id).eq('user_id', userId);
+    // Find current user's RSVP to get partner_ids
+    const userRsvp = guests.find(g => g.profile.id === userId)?.rsvp;
+    const partners = userRsvp?.partner_ids || [];
+    const allUsers = [userId, ...partners];
 
-    await supabase.from('claims').insert({
-      event_id: event.id,
-      recipe_id: recipeId,
-      user_id: userId,
-      is_suggestion: false,
-    });
+    // Remove any existing claim first for user and partners
+    for (const uid of allUsers) {
+      await supabase.from('claims').delete().eq('event_id', event.id).eq('user_id', uid);
+      await supabase.from('claims').insert({
+        event_id: event.id,
+        recipe_id: recipeId,
+        user_id: uid,
+        is_suggestion: false,
+      });
+    }
 
     loadData();
   };
 
   const handleUnclaim = async (claimId: string) => {
+    if (!userId || !event) return;
     const supabase = createBrowserSupabase();
-    await supabase.from('claims').delete().eq('id', claimId);
+
+    // Find the claim
+    const { data: claimData } = await supabase.from('claims').select('*').eq('id', claimId).single();
+    if (claimData) {
+      // Find the user's partners
+      const { data: rsvpData } = await supabase.from('rsvps').select('partner_ids').eq('event_id', event.id).eq('user_id', claimData.user_id).single();
+      const partners = rsvpData?.partner_ids || [];
+      const allUsers = [claimData.user_id, ...partners];
+
+      for (const uid of allUsers) {
+        await supabase.from('claims').delete().eq('event_id', event.id).eq('user_id', uid);
+      }
+    } else {
+      await supabase.from('claims').delete().eq('id', claimId);
+    }
+
     loadData();
   };
 
@@ -227,6 +251,16 @@ export default function EventPage() {
       return 0;
     });
   }, [guests, userId]);
+
+  const courseCounts = useMemo(() => {
+    const counts: Record<Course, number> = { appetizer: 0, main: 0, side: 0, dessert: 0 };
+    guests.forEach(g => {
+      if (g.rsvp?.status === 'attending' && g.rsvp?.course_preference) {
+        counts[g.rsvp.course_preference]++;
+      }
+    });
+    return counts;
+  }, [guests]);
 
   if (loading) {
     return (
@@ -325,36 +359,18 @@ export default function EventPage() {
                 </div>
               )}
 
-              {/* RSVP toggle */}
-              <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(212, 184, 150, 0.2)' }}>
-                <p className="font-body text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--accent-warm)' }}>
-                  Your RSVP
-                </p>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleToggleRsvp}
-                    className="flex items-center gap-2 py-1.5 px-4 rounded-full text-xs font-body transition-all"
-                    style={{
-                      background: userRsvpStatus === 'attending' ? 'var(--accent)' : 'transparent',
-                      color: userRsvpStatus === 'attending' ? 'var(--surface)' : 'var(--accent-warm)',
-                      border: `1.5px solid ${userRsvpStatus === 'attending' ? 'var(--accent)' : 'var(--accent-warm)'}`,
-                    }}
-                  >
-                    {userRsvpStatus === 'attending' ? '✓ Attending' : 'Attend'}
-                  </button>
-                  <button
-                    onClick={handleToggleRsvp}
-                    className="flex items-center gap-2 py-1.5 px-4 rounded-full text-xs font-body transition-all"
-                    style={{
-                      background: userRsvpStatus === 'declined' ? 'var(--accent-warm)' : 'transparent',
-                      color: userRsvpStatus === 'declined' ? 'var(--surface)' : 'var(--accent-warm)',
-                      border: `1.5px solid var(--accent-warm)`,
-                    }}
-                  >
-                    {userRsvpStatus === 'declined' ? '✗ Can\'t make it' : 'Can\'t make it'}
-                  </button>
-                </div>
-              </div>
+              {userId && (
+                <RSVPForm
+                  eventId={event.id}
+                  userId={userId}
+                  userRsvpStatus={userRsvpStatus}
+                  currentCourse={(guests.find(g => g.profile.id === userId)?.rsvp?.course_preference) || null}
+                  currentPartners={(guests.find(g => g.profile.id === userId)?.rsvp?.partner_ids) || []}
+                  allProfiles={allProfiles}
+                  courseCounts={courseCounts}
+                  onComplete={loadData}
+                />
+              )}
             </div>
 
             {/* Cookbook cover image */}
