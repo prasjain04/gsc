@@ -52,6 +52,7 @@ create table public.cookbooks (
   id uuid default uuid_generate_v4() primary key,
   name text not null,
   cover_url text,
+  pdf_url text,
   event_id uuid references public.events on delete cascade,
   created_at timestamptz default now()
 );

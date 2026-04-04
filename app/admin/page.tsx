@@ -37,6 +37,7 @@ export default function AdminPage() {
   const [cookbookName, setCookbookName] = useState('');
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState('');
+  const [pdfUrl, setPdfUrl] = useState('');
   const [colorTheme, setColorTheme] = useState('');
 
   // Recipe JSON state
@@ -108,6 +109,7 @@ export default function AdminPage() {
         setExistingCookbookId(cookbookData.id);
         setCookbookName(cookbookData.name);
         if (cookbookData.cover_url) setCoverPreview(cookbookData.cover_url);
+        if (cookbookData.pdf_url) setPdfUrl(cookbookData.pdf_url);
 
         const { data: recipesData } = await supabase
           .from('recipes')
@@ -299,11 +301,13 @@ export default function AdminPage() {
         await supabase.from('cookbooks').update({
           name: cookbookName.trim(),
           cover_url: coverUrl || null,
+          pdf_url: pdfUrl.trim() || null,
         }).eq('id', cookbookId);
       } else {
         const { data: newCookbook } = await supabase.from('cookbooks').insert({
           name: cookbookName.trim(),
           cover_url: coverUrl || null,
+          pdf_url: pdfUrl.trim() || null,
           event_id: eventId!,
         }).select().single();
         cookbookId = newCookbook?.id;
@@ -474,6 +478,11 @@ export default function AdminPage() {
                 <div>
                   <label className="block text-xs font-body uppercase tracking-widest mb-1" style={{ color: 'var(--accent-warm)' }}>Cookbook Name</label>
                   <input type="text" value={cookbookName} onChange={(e) => setCookbookName(e.target.value)} className="input-elegant font-body" placeholder="e.g. The Chutney Life" />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-body uppercase tracking-widest mb-1" style={{ color: 'var(--accent-warm)' }}>Cookbook PDF Link</label>
+                  <input type="text" value={pdfUrl} onChange={(e) => setPdfUrl(e.target.value)} className="input-elegant font-body text-xs" placeholder="https://drive.google.com/..." />
                 </div>
 
                 <div>

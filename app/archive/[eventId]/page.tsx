@@ -15,6 +15,7 @@ export default function ArchivedEventPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [cookbook, setCookbook] = useState<Cookbook | null>(null);
   const [recipes, setRecipes] = useState<(Recipe & { claim?: ClaimWithDetails })[]>([]);
+  const [attendees, setAttendees] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,6 +45,15 @@ export default function ArchivedEventPage() {
       .eq('event_id', eventId)
       .single();
     setCookbook(cookbookData);
+
+    // Get attendees
+    const { data: rsvps } = await supabase
+      .from('rsvps')
+      .select('profile:profiles(*)')
+      .eq('event_id', eventId)
+      .eq('status', 'attending');
+
+    setAttendees((rsvps || []).map((r: any) => r.profile).filter(Boolean));
 
     if (cookbookData) {
       const { data: recipesData } = await supabase
@@ -110,29 +120,88 @@ export default function ArchivedEventPage() {
           ← Back to archive
         </button>
 
-        {/* Header */}
+        {/* Event info header */}
         <div className="text-center mb-8">
-          <h1 className="font-display italic text-2xl mb-1" style={{ color: 'var(--ink)' }}>
-            Vol. {toRoman(event.volume_number)} · {formatInviteDate(event.date)}
-          </h1>
-          <p className="font-display italic text-sm" style={{ color: 'var(--accent)' }}>
-            A beautiful evening 🍷
+          <p className="font-body text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--accent)' }}>
+            Vol. {toRoman(event.volume_number)}
           </p>
+          <h1 className="font-display italic text-2xl mb-3" style={{ color: 'var(--ink)' }}>
+            Girls Supper Club
+          </h1>
+
+          {/* Event details */}
+          <div className="space-y-1 mb-6">
+            <p className="font-body text-sm" style={{ color: 'var(--ink)' }}>
+              📅 {formatInviteDate(event.date)}
+            </p>
+            {event.event_time && (
+              <p className="font-body text-sm" style={{ color: 'var(--ink)' }}>
+                🕐 {event.event_time}
+              </p>
+            )}
+            {event.location && (
+              <p className="font-body text-sm" style={{ color: 'var(--ink)' }}>
+                📍 {event.location}
+              </p>
+            )}
+          </div>
+
+          {/* Cookbook */}
           {cookbook && (
             <div className="mt-4">
               {cookbook.cover_url && (
-                <img
-                  src={cookbook.cover_url}
-                  alt={cookbook.name}
-                  className="w-20 h-28 mx-auto rounded shadow-sm object-cover mb-2"
-                />
+                <a
+                  href={cookbook.pdf_url || '#'}
+                  target={cookbook.pdf_url ? '_blank' : undefined}
+                  rel="noopener noreferrer"
+                  className="block group"
+                >
+                  <img
+                    src={cookbook.cover_url}
+                    alt={cookbook.name}
+                    className="w-32 h-44 mx-auto rounded shadow-md object-cover mb-2 transition-transform duration-300 group-hover:scale-105"
+                  />
+                  {cookbook.pdf_url && (
+                    <p className="text-center font-body text-xs mt-1" style={{ color: 'var(--accent)' }}>
+                      Tap to view cookbook →
+                    </p>
+                  )}
+                </a>
               )}
-              <p className="font-display italic text-base" style={{ color: 'var(--ink)' }}>
+              <p className="font-display italic text-base mt-2" style={{ color: 'var(--ink)' }}>
                 {cookbook.name}
               </p>
             </div>
           )}
         </div>
+
+        {/* Attendees */}
+        {attendees.length > 0 && (
+          <div className="mb-6">
+            <p className="font-body text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--accent-warm)' }}>
+              {attendees.length} girlies attended 🍷
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {attendees.map(a => (
+                <div key={a.id} className="flex items-center gap-1.5 py-1 px-2 rounded-full" style={{
+                  background: 'var(--surface)',
+                  border: '1px solid rgba(212, 184, 150, 0.3)',
+                }}>
+                  <div className="w-5 h-5 rounded-full overflow-hidden" style={{ border: '1px solid var(--accent-warm)' }}>
+                    {a.avatar_url ? (
+                      <img src={a.avatar_url} alt={a.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs font-display italic" style={{ color: 'var(--accent-warm)' }}>
+                        {a.name?.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-xs font-body" style={{ color: 'var(--ink)' }}>{a.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="divider-fine" />
 

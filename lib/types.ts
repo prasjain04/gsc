@@ -35,6 +35,7 @@ export interface Cookbook {
   id: string;
   name: string;
   cover_url: string | null;
+  pdf_url: string | null;
   event_id: string;
   created_at: string;
 }

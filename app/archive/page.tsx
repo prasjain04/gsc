@@ -4,16 +4,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserSupabase } from '@/lib/supabase';
 import EventCard from '@/components/archive/EventCard';
-import type { EventWithCookbook, Profile } from '@/lib/types';
-
-interface ArchiveEvent {
-  event: EventWithCookbook;
-  attendees: Profile[];
-}
+import type { EventWithCookbook } from '@/lib/types';
 
 export default function ArchivePage() {
   const router = useRouter();
-  const [events, setEvents] = useState<ArchiveEvent[]>([]);
+  const [events, setEvents] = useState<EventWithCookbook[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,34 +18,14 @@ export default function ArchivePage() {
   const loadArchive = async () => {
     const supabase = createBrowserSupabase();
 
-    // Get past events (date has passed or is_active = false)
+    // Get past events (date has passed)
     const { data: eventsData } = await supabase
       .from('events')
       .select('*, cookbook:cookbooks(*)')
       .lt('date', new Date().toISOString().split('T')[0])
       .order('date', { ascending: false });
 
-    if (!eventsData || eventsData.length === 0) {
-      setLoading(false);
-      return;
-    }
-
-    // For each event, get attendees
-    const archiveEvents: ArchiveEvent[] = [];
-    for (const event of eventsData) {
-      const { data: rsvps } = await supabase
-        .from('rsvps')
-        .select('profile:profiles(*)')
-        .eq('event_id', event.id)
-        .eq('status', 'attending');
-
-      archiveEvents.push({
-        event,
-        attendees: (rsvps || []).map((r: any) => r.profile).filter(Boolean),
-      });
-    }
-
-    setEvents(archiveEvents);
+    setEvents(eventsData || []);
     setLoading(false);
   };
 
@@ -85,12 +60,11 @@ export default function ArchivePage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {events.map((item, i) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+            {events.map((event, i) => (
               <EventCard
-                key={item.event.id}
-                event={item.event}
-                attendees={item.attendees}
+                key={event.id}
+                event={event}
                 index={i}
               />
             ))}

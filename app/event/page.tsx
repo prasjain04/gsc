@@ -360,8 +360,8 @@ export default function EventPage() {
             {/* Cookbook cover image */}
             {cookbook?.cover_url && (
               <a
-                href="https://drive.google.com/file/d/1jhak8Njmp9kDRDU4DGKDEm_cXAm7M7VH/view?usp=sharing"
-                target="_blank"
+                href={cookbook.pdf_url || '#'}
+                target={cookbook.pdf_url ? '_blank' : undefined}
                 rel="noopener noreferrer"
                 className="block group"
               >
