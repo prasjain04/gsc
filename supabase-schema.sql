@@ -140,10 +140,10 @@ create policy "Events are viewable by authenticated users"
   to authenticated
   using (true);
 
-create policy "Events are viewable by anonymous users (for landing page)"
+create policy "Events are viewable by anonymous users"
   on public.events for select
   to anon
-  using (is_active = true);
+  using (true);
 
 create policy "Admins can manage events"
   on public.events for all
