@@ -12,6 +12,7 @@ interface RecipeRowProps {
   userHasClaim: boolean;
   isDisabled: boolean;
   disabledMessage?: string;
+  isLocked: boolean;
   onClaim: (recipeId: string) => void;
   onUnclaim: (claimId: string) => void;
 }
@@ -22,6 +23,7 @@ export default function RecipeRow({
   userHasClaim,
   isDisabled,
   disabledMessage,
+  isLocked,
   onClaim,
   onUnclaim,
 }: RecipeRowProps) {
@@ -34,8 +36,8 @@ export default function RecipeRow({
   const rowClass = isMyClam
     ? 'recipe-row my-claim'
     : isClaimed
-      ? 'recipe-row claimed'
-      : 'recipe-row';
+    ? 'recipe-row claimed'
+    : 'recipe-row';
 
   return (
     <div>
@@ -89,6 +91,7 @@ export default function RecipeRow({
                 isMyClam={isMyClam}
                 isDisabled={isDisabled || (userHasClaim && !isMyClam)}
                 disabledMessage={userHasClaim && !isMyClam ? "You've already claimed a dish" : disabledMessage}
+                isLocked={isLocked}
                 onClaim={() => onClaim(recipe.id)}
                 onUnclaim={() => recipe.claim && onUnclaim(recipe.claim.id)}
               />

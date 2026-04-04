@@ -22,8 +22,11 @@ export interface Event {
   title: string;
   volume_number: number;
   date: string;
+  event_time: string | null;
+  location: string | null;
   cookbook_id: string | null;
   color_theme: string | null; // JSON string of color overrides
+  lock_time: string | null;
   is_active: boolean;
   created_at: string;
 }

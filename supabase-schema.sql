@@ -41,7 +41,7 @@ create table public.events (
   date date not null,
   cookbook_id uuid,
   color_theme text, -- JSON string of color overrides
-
+  lock_time timestamptz,
   is_active boolean default true,
   created_at timestamptz default now()
 );
