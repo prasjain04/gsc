@@ -322,6 +322,40 @@ export default function AdminPage() {
     setSaving(false);
   };
 
+  const handleArchiveAndStartNew = async () => {
+    if (!confirm('Are you sure? This will archive the current event and clear all RSVPs/Claims to start fresh.')) return;
+
+    setSaving(true);
+    const supabase = createBrowserSupabase();
+
+    // Archive current
+    if (existingEventId) {
+      await supabase.from('events').update({ is_active: false }).eq('id', existingEventId);
+    }
+
+    // Start fresh
+    const nextVolume = volumeNumber + 1;
+    const greenTheme = '{"bg": "#F5F8F5", "ink": "#2C3E2F", "accent": "#4A6B53", "accentWarm": "#8BA892", "surface": "#FFFFFF"}';
+    const numDays = 30; // Roughly next month
+    const nextDate = new Date();
+    nextDate.setDate(nextDate.getDate() + numDays);
+    const nextDateStr = nextDate.toISOString().split('T')[0];
+
+    // Create new event
+    await supabase.from('events').insert({
+      title: `Girls Supper Club`,
+      volume_number: nextVolume,
+      date: nextDateStr,
+      color_theme: greenTheme,
+      is_active: true,
+      lock_time: new Date(nextDate.getTime() - 48 * 60 * 60 * 1000).toISOString(),
+    });
+
+    // Reload page
+    window.location.reload();
+  };
+
+
   const handlePublishRecipes = async () => {
     if (parsedRecipes.length === 0) { setMessage('No recipes to publish — paste JSON first'); return; }
     if (!existingCookbookId) { setMessage('Save the event first'); return; }
@@ -427,7 +461,18 @@ export default function AdminPage() {
           <div style={{ opacity: isAdmin ? 1 : 0.5, pointerEvents: isAdmin ? 'auto' : 'none' }}>
             {/* Section 1: Event Details */}
             <section className="mb-10">
-              <h2 className="font-display italic text-xl mb-4" style={{ color: 'var(--ink)' }}>Event Details</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="font-display italic text-xl" style={{ color: 'var(--ink)' }}>Event Details</h2>
+                {existingEventId && (
+                  <button
+                    onClick={handleArchiveAndStartNew}
+                    className="px-3 py-1.5 text-xs font-body rounded transition-transform hover:scale-105"
+                    style={{ background: 'var(--accent)', color: 'var(--surface)' }}
+                  >
+                    Archive & Start Next
+                  </button>
+                )}
+              </div>
               <div className="space-y-4" style={{ background: 'var(--surface)', padding: '1.5rem', borderRadius: '8px' }}>
 
                 <div>
