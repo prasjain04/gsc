@@ -173,7 +173,20 @@ export default function EventPage() {
     if (!userId || !event) return;
     const supabase = createBrowserSupabase();
 
-    // 1. Update the user's RSVP to include course & partners, and set to attending (in case they weren't somehow)
+    // 1. Clean up old claims — find old partners first
+    const { data: oldRsvp } = await supabase
+      .from('rsvps')
+      .select('partner_ids')
+      .eq('event_id', event.id)
+      .eq('user_id', userId)
+      .single();
+    const oldPartnerIds: string[] = oldRsvp?.partner_ids || [];
+    const allOldUsers = [userId, ...oldPartnerIds];
+    for (const uid of allOldUsers) {
+      await supabase.from('claims').delete().eq('event_id', event.id).eq('user_id', uid);
+    }
+
+    // 2. Update the user's RSVP with course & partners
     await supabase.from('rsvps').upsert({
       event_id: event.id,
       user_id: userId,
@@ -182,7 +195,18 @@ export default function EventPage() {
       partner_ids: partnerIds,
     }, { onConflict: 'event_id,user_id' });
 
-    // 2. Sync partner RSVPs — include claiming user in each partner's partner_ids
+    // 3. Create claims for user + partners
+    const allNewUsers = [userId, ...partnerIds];
+    for (const uid of allNewUsers) {
+      await supabase.from('claims').insert({
+        event_id: event.id,
+        recipe_id: recipeId,
+        user_id: uid,
+        is_suggestion: false,
+      });
+    }
+
+    // 4. Try to sync partner RSVPs (may be limited by RLS for non-admin)
     for (const pid of partnerIds) {
       const { data: existing } = await supabase
         .from('rsvps')
@@ -205,19 +229,7 @@ export default function EventPage() {
       }, { onConflict: 'event_id,user_id' });
     }
 
-    // 3. Sync claims
-    const allUsers = [userId, ...partnerIds];
-    for (const uid of allUsers) {
-      await supabase.from('claims').delete().eq('event_id', event.id).eq('user_id', uid);
-      await supabase.from('claims').insert({
-        event_id: event.id,
-        recipe_id: recipeId,
-        user_id: uid,
-        is_suggestion: false,
-      });
-    }
-
-    loadData();
+    await loadData();
   };
 
   const handleUnclaim = async (claimId: string) => {
@@ -297,8 +309,12 @@ export default function EventPage() {
   const courseCounts = useMemo(() => {
     const counts: Record<Course, number> = { appetizer: 0, main: 0, side: 0, dessert: 0 };
     guests.forEach(g => {
-      if (g.rsvp?.status === 'attending' && g.rsvp?.course_preference) {
-        counts[g.rsvp.course_preference]++;
+      if (g.rsvp?.status === 'attending') {
+        // Use RSVP course_preference first, fall back to claim's recipe course
+        const course = g.rsvp?.course_preference || (g.claim?.recipe?.course as Course | undefined);
+        if (course && counts[course] !== undefined) {
+          counts[course]++;
+        }
       }
     });
     return counts;

@@ -24,18 +24,34 @@ export default function GuestCard({ guest, isCurrentUser, allProfiles = [], allG
         ? (claim.suggestion_allergens || [])
         : (claim?.recipe?.allergens || []);
 
-    // Find cooking partners - check own partner_ids AND who listed this person as a partner
+    // Find cooking partners via multiple signals:
+    // 1. RSVP partner_ids (forward + reverse)
+    // 2. Other guests with claims for the same recipe
     const partnerNames: string[] = [];
     if (recipeName) {
-        // People this guest listed as partners
-        const ownPartnerIds = rsvp?.partner_ids || [];
-        // People who listed this guest as their partner
-        const reversePartnerIds = allGuests
-            .filter(g => g.rsvp?.partner_ids?.includes(profile.id) && g.profile.id !== profile.id)
-            .map(g => g.profile.id);
-        // Merge and dedupe
-        const allPartnerIds = Array.from(new Set([...ownPartnerIds, ...reversePartnerIds]));
-        allPartnerIds.forEach(pid => {
+        const partnerIdSet = new Set<string>();
+
+        // From RSVP partner_ids
+        (rsvp?.partner_ids || []).forEach((pid: string) => partnerIdSet.add(pid));
+
+        // Reverse: who listed this guest as their partner
+        allGuests.forEach(g => {
+            if (g.profile.id !== profile.id && g.rsvp?.partner_ids?.includes(profile.id)) {
+                partnerIdSet.add(g.profile.id);
+            }
+        });
+
+        // Same recipe claim: other guests who claimed the same recipe_id
+        const myRecipeId = claim?.recipe_id;
+        if (myRecipeId) {
+            allGuests.forEach(g => {
+                if (g.profile.id !== profile.id && g.claim?.recipe_id === myRecipeId) {
+                    partnerIdSet.add(g.profile.id);
+                }
+            });
+        }
+
+        partnerIdSet.forEach(pid => {
             const p = allProfiles.find(pr => pr.id === pid);
             if (p) partnerNames.push(p.name);
         });

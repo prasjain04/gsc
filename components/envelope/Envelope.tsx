@@ -151,9 +151,9 @@ export default function Envelope({ children, onOpen }: EnvelopeProps) {
           >
             <div className="relative w-14 h-14 flex items-center justify-center">
               <div className="absolute inset-0" style={{
-                background: 'radial-gradient(circle at 40% 35%, #D4564A 0%, #B8443A 40%, #9C3830 100%)',
+                background: 'radial-gradient(circle at 40% 35%, #5B9A6B 0%, #4A7C59 40%, #3D6A4B 100%)',
                 borderRadius: '47% 53% 52% 48% / 49% 45% 55% 51%',
-                boxShadow: '0 3px 8px rgba(156, 56, 48, 0.4), inset 0 1px 2px rgba(255,255,255,0.15)',
+                boxShadow: '0 3px 8px rgba(74, 124, 89, 0.4), inset 0 1px 2px rgba(255,255,255,0.15)',
               }} />
               <div className="absolute" style={{
                 inset: '6px', border: '1.5px solid rgba(255,255,255,0.2)', borderRadius: '50%',

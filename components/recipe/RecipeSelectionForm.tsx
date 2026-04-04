@@ -79,11 +79,7 @@ export default function RecipeSelectionForm({
     const handleConfirm = () => {
         if (!selectedRecipeId || !allergensAcknowledged || !selectedCourse) return;
 
-        // If user already has a claim, unclaim first
-        if (currentClaim?.claimId) {
-            onUnclaim(currentClaim.claimId);
-        }
-
+        // handleClaim handles cleanup of old claims internally — no need to call onUnclaim
         onClaim(selectedRecipeId, selectedCourse, selectedPartners);
         setIsOpen(false);
         setSelectedRecipeId('');
