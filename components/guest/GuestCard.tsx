@@ -123,6 +123,16 @@ export default function GuestCard({ guest, isCurrentUser, allProfiles = [], allG
                 </div>
             </div>
 
+            {/* Temporary debug — remove after fixing */}
+            {isCurrentUser && (
+                <div className="mb-2 p-2 rounded text-[9px] font-mono leading-relaxed" style={{ background: '#f0f0f0', color: '#333', wordBreak: 'break-all' }}>
+                    <div>partner_ids: {JSON.stringify(rsvp?.partner_ids)}</div>
+                    <div>course_pref: {JSON.stringify(rsvp?.course_preference)}</div>
+                    <div>has_claim: {String(!!claim)}</div>
+                    <div>partnerNames: {JSON.stringify(partnerNames)}</div>
+                </div>
+            )}
+
             {/* Dish info */}
             {recipeName ? (
                 <div>
