@@ -65,7 +65,14 @@ export default function EventPage() {
       .select('*')
       .eq('event_id', eventData.id)
       .single();
-    setCookbook(cookbookData);
+    if (cookbookData) setCookbook(cookbookData);
+
+    // Get ALL profiles for partner selection
+    const { data: allProfilesData } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('name');
+    setAllProfiles(allProfilesData || []);
 
     // Get recipes
     const { data: recipesData } = await supabase
