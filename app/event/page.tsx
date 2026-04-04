@@ -196,9 +196,7 @@ export default function EventPage() {
     loadData();
   };
 
-  const isLocked = event?.lock_time
-    ? new Date(event.lock_time) < new Date()
-    : false;
+  const isLocked = false;
 
   // Current user's claim info for the form
   const currentUserClaim = useMemo(() => {
