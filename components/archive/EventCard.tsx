@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { toRoman } from '@/lib/theme';
+import { toRoman, formatInviteDate } from '@/lib/theme';
 import type { EventWithCookbook } from '@/lib/types';
 
 interface EventCardProps {
@@ -53,8 +53,8 @@ export default function EventCard({ event, index }: EventCardProps) {
           <p className="font-display italic text-sm" style={{ color: 'var(--ink)' }}>
             Vol. {toRoman(event.volume_number)}
           </p>
-          <p className="font-body text-xs" style={{ color: 'var(--accent-warm)' }}>
-            {event.cookbook?.name}
+          <p className="font-body text-xs mt-0.5" style={{ color: 'var(--accent-warm)', opacity: 0.8 }}>
+            {formatInviteDate(event.date)}
           </p>
         </div>
       </motion.div>
