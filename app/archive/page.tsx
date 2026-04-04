@@ -51,7 +51,7 @@ export default function ArchivePage() {
       cookbook: {
         id: 'mock',
         name: 'The Chutney Life',
-        cover_url: 'https://m.media-amazon.com/images/I/81+L0WwK-RL._AC_UF1000,1000_QL80_.jpg',
+        cover_url: 'https://images.penguinrandomhouse.com/cover/9780593579564',
         pdf_url: 'https://drive.google.com/file/d/1jhak8Njmp9kDRDU4DGKDEm_cXAm7M7VH/view?usp=drive_link',
         event_id: 'vol1',
         created_at: '2026-03-01T00:00:00Z'

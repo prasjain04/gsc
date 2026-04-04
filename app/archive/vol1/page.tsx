@@ -17,7 +17,7 @@ export default function Vol1ArchivePage() {
 
     const declined = ['Yax', 'Thara Konduri'];
 
-    const coverUrl = 'https://m.media-amazon.com/images/I/81+L0WwK-RL._AC_UF1000,1000_QL80_.jpg';
+    const coverUrl = 'https://images.penguinrandomhouse.com/cover/9780593579564';
     const pdfUrl = 'https://drive.google.com/file/d/1jhak8Njmp9kDRDU4DGKDEm_cXAm7M7VH/view?usp=drive_link';
 
     return (
