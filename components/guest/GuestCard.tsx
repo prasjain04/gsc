@@ -28,6 +28,16 @@ export default function GuestCard({ guest, isCurrentUser, allProfiles = [], allG
     // 1. RSVP partner_ids (forward + reverse)
     // 2. Other guests with claims for the same recipe
     const partnerNames: string[] = [];
+    // Debug: log partner data for troubleshooting
+    if (isCurrentUser && recipeName) {
+        console.log('[GuestCard debug]', {
+            name: profile.name,
+            rsvpPartnerIds: rsvp?.partner_ids,
+            claimRecipeId: claim?.recipe_id,
+            allGuestsCount: allGuests.length,
+            allProfilesCount: allProfiles.length,
+        });
+    }
     if (recipeName) {
         const partnerIdSet = new Set<string>();
 

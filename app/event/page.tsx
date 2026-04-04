@@ -186,47 +186,66 @@ export default function EventPage() {
       await supabase.from('claims').delete().eq('event_id', event.id).eq('user_id', uid);
     }
 
-    // 2. Update the user's RSVP with course & partners
-    await supabase.from('rsvps').upsert({
-      event_id: event.id,
-      user_id: userId,
-      status: 'attending',
-      course_preference: course,
-      partner_ids: partnerIds,
-    }, { onConflict: 'event_id,user_id' });
+    // 2. Update the user's RSVP with course & partners using explicit update
+    const { error: updateError } = await supabase
+      .from('rsvps')
+      .update({
+        status: 'attending',
+        course_preference: course,
+        partner_ids: partnerIds,
+      })
+      .eq('event_id', event.id)
+      .eq('user_id', userId);
+
+    if (updateError) {
+      console.error('RSVP update failed, trying insert:', updateError);
+      await supabase.from('rsvps').insert({
+        event_id: event.id,
+        user_id: userId,
+        status: 'attending',
+        course_preference: course,
+        partner_ids: partnerIds,
+      });
+    }
 
     // 3. Create claims for user + partners
     const allNewUsers = [userId, ...partnerIds];
     for (const uid of allNewUsers) {
-      await supabase.from('claims').insert({
+      const { error: claimError } = await supabase.from('claims').insert({
         event_id: event.id,
         recipe_id: recipeId,
         user_id: uid,
         is_suggestion: false,
       });
+      if (claimError) {
+        console.error(`Claim insert failed for ${uid}:`, claimError);
+      }
     }
 
     // 4. Try to sync partner RSVPs (may be limited by RLS for non-admin)
     for (const pid of partnerIds) {
       const { data: existing } = await supabase
         .from('rsvps')
-        .select('*')
+        .select('partner_ids')
         .eq('event_id', event.id)
         .eq('user_id', pid)
         .single();
 
-      const existingPartners = existing?.partner_ids || [];
-      const updatedPartners = existingPartners.includes(userId)
-        ? existingPartners
-        : [...existingPartners, userId];
+      if (existing) {
+        const existingPartners = existing.partner_ids || [];
+        const updatedPartners = existingPartners.includes(userId)
+          ? existingPartners
+          : [...existingPartners, userId];
 
-      await supabase.from('rsvps').upsert({
-        event_id: event.id,
-        user_id: pid,
-        status: 'attending',
-        course_preference: course,
-        partner_ids: updatedPartners,
-      }, { onConflict: 'event_id,user_id' });
+        await supabase
+          .from('rsvps')
+          .update({
+            course_preference: course,
+            partner_ids: updatedPartners,
+          })
+          .eq('event_id', event.id)
+          .eq('user_id', pid);
+      }
     }
 
     await loadData();
