@@ -9,7 +9,6 @@ interface RecipeListProps {
   recipes: RecipeWithClaim[];
   suggestions: ClaimWithDetails[];
   currentUserId: string;
-  isLocked: boolean;
   onClaim: (recipeId: string) => void;
   onUnclaim: (claimId: string) => void;
 }
@@ -18,7 +17,6 @@ export default function RecipeList({
   recipes,
   suggestions,
   currentUserId,
-  isLocked,
   onClaim,
   onUnclaim,
 }: RecipeListProps) {
@@ -110,7 +108,6 @@ export default function RecipeList({
                     userHasClaim={rules.userHasClaim}
                     isDisabled={isDisabled}
                     disabledMessage={disabledMessage}
-                    isLocked={isLocked}
                     onClaim={onClaim}
                     onUnclaim={onUnclaim}
                   />

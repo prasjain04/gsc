@@ -7,7 +7,6 @@ interface ClaimButtonProps {
   isMyClam: boolean;
   isDisabled: boolean;
   disabledMessage?: string;
-  isLocked: boolean;
   onClaim: () => void;
   onUnclaim: () => void;
 }
@@ -17,7 +16,6 @@ export default function ClaimButton({
   isMyClam,
   isDisabled,
   disabledMessage,
-  isLocked,
   onClaim,
   onUnclaim,
 }: ClaimButtonProps) {
@@ -31,17 +29,15 @@ export default function ClaimButton({
         whileTap={{ scale: 0.95 }}
         onClick={(e) => {
           e.stopPropagation();
-          if (!isLocked) onUnclaim();
+          onUnclaim();
         }}
-        disabled={isLocked}
         className="text-xs font-body py-1.5 px-4 rounded-full transition-all"
         style={{
-          background: isLocked ? 'var(--accent-warm)' : 'var(--accent)',
+          background: 'var(--accent)',
           color: 'var(--surface)',
-          opacity: isLocked ? 0.5 : 1,
         }}
       >
-        {isLocked ? '🔒 Locked' : 'Unclaim'}
+        Unclaim
       </motion.button>
     );
   }
