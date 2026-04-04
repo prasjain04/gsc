@@ -5,8 +5,8 @@
 :root {
   --bg: #FAF7F2;
   --ink: #1A1A1A;
-  --accent: #C4473A;
-  --accent-warm: #D4B896;
+  --accent: #4A7C59;
+  --accent-warm: #9BB5A0;
   --surface: #FFFFFF;
 }
 
@@ -88,8 +88,8 @@ body {
 }
 
 .btn-elegant-filled:hover {
-  background: #a83a2f;
-  border-color: #a83a2f;
+  background: #3d6a4b;
+  border-color: #3d6a4b;
 }
 
 /* Dietary pill buttons */
@@ -136,7 +136,7 @@ body {
 
 .recipe-row.my-claim {
   opacity: 1;
-  background: rgba(196, 71, 58, 0.05);
+  background: rgba(74, 124, 89, 0.05);
   border-left: 3px solid var(--accent);
   padding-left: calc(1rem - 3px);
 }
@@ -184,11 +184,11 @@ body {
 
 .guest-card-you {
   border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent), 0 2px 12px rgba(196, 71, 58, 0.12);
+  box-shadow: 0 0 0 1px var(--accent), 0 2px 12px rgba(74, 124, 89, 0.12);
 }
 
 .guest-card-you:hover {
-  box-shadow: 0 0 0 1px var(--accent), 0 4px 20px rgba(196, 71, 58, 0.18);
+  box-shadow: 0 0 0 1px var(--accent), 0 4px 20px rgba(74, 124, 89, 0.18);
 }
 
 /* Recipe selection panel */
@@ -223,8 +223,8 @@ body {
 .allergen-confirm {
   padding: 0.75rem;
   border-radius: 8px;
-  background: rgba(196, 71, 58, 0.04);
-  border: 1px dashed rgba(196, 71, 58, 0.2);
+  background: rgba(74, 124, 89, 0.04);
+  border: 1px dashed rgba(74, 124, 89, 0.2);
 }
 
 /* Event info block */

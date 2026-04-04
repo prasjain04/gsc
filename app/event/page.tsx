@@ -6,12 +6,12 @@ import { createBrowserSupabase } from '@/lib/supabase';
 import { toRoman, formatInviteDate } from '@/lib/theme';
 import GuestCard from '@/components/guest/GuestCard';
 import RecipeSelectionForm from '@/components/recipe/RecipeSelectionForm';
-import { ALLERGEN_EMOJI } from '@/lib/types';
 import RSVPForm from '@/components/rsvp/RSVPForm';
 import type {
   Event, Cookbook, RecipeWithClaim, ClaimWithDetails,
   GuestInfo, Profile, Claim, Recipe, Course, Allergen,
 } from '@/lib/types';
+import { ALLERGEN_EMOJI, COURSE_ORDER, COURSE_LABELS, COURSE_QUOTAS } from '@/lib/types';
 
 export default function EventPage() {
   const router = useRouter();
@@ -182,7 +182,7 @@ export default function EventPage() {
       partner_ids: partnerIds,
     }, { onConflict: 'event_id,user_id' });
 
-    // 2. Sync partner RSVPs
+    // 2. Sync partner RSVPs — include claiming user in each partner's partner_ids
     for (const pid of partnerIds) {
       const { data: existing } = await supabase
         .from('rsvps')
@@ -191,12 +191,17 @@ export default function EventPage() {
         .eq('user_id', pid)
         .single();
 
+      const existingPartners = existing?.partner_ids || [];
+      const updatedPartners = existingPartners.includes(userId)
+        ? existingPartners
+        : [...existingPartners, userId];
+
       await supabase.from('rsvps').upsert({
         event_id: event.id,
         user_id: pid,
         status: 'attending',
         course_preference: course,
-        partner_ids: existing?.partner_ids || [],
+        partner_ids: updatedPartners,
       }, { onConflict: 'event_id,user_id' });
     }
 
@@ -464,11 +469,25 @@ export default function EventPage() {
               />
             </div>
 
-            {/* Guest count */}
-            <div className="flex items-center justify-between mb-4">
+            {/* Guest count & Course totals */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
               <p className="font-display italic text-lg" style={{ color: 'var(--ink)' }}>
                 {guests.length} {guests.length === 1 ? 'girlie' : 'girlies'} coming 🍴
               </p>
+              <div className="flex gap-2 flex-wrap">
+                {COURSE_ORDER.map(c => {
+                  const num = courseCounts[c] || 0;
+                  const quota = COURSE_QUOTAS[c];
+                  return (
+                    <span key={c} className="text-[10px] uppercase font-body px-1.5 py-0.5 rounded" style={{
+                      background: num > 0 ? 'var(--accent)' : 'rgba(155, 181, 160, 0.15)',
+                      color: num > 0 ? 'var(--surface)' : 'var(--ink)',
+                    }}>
+                      {num}/{quota} {COURSE_LABELS[c]}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Guest cards grid */}
@@ -478,6 +497,8 @@ export default function EventPage() {
                   key={guest.profile.id}
                   guest={guest}
                   isCurrentUser={guest.profile.id === userId}
+                  allProfiles={allProfiles}
+                  allGuests={guests}
                 />
               ))}
             </div>

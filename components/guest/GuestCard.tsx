@@ -1,17 +1,19 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ALLERGEN_EMOJI } from '@/lib/types';
-import type { GuestInfo, Allergen } from '@/lib/types';
+import { ALLERGEN_EMOJI, COURSE_LABELS } from '@/lib/types';
+import type { GuestInfo, Allergen, Profile } from '@/lib/types';
 
 interface GuestCardProps {
     guest: GuestInfo;
     isCurrentUser: boolean;
+    allProfiles?: Profile[];
+    allGuests?: GuestInfo[];
     onSelectDish?: () => void;
 }
 
-export default function GuestCard({ guest, isCurrentUser, onSelectDish }: GuestCardProps) {
-    const { profile, claim } = guest;
+export default function GuestCard({ guest, isCurrentUser, allProfiles = [], allGuests = [], onSelectDish }: GuestCardProps) {
+    const { profile, claim, rsvp } = guest;
 
     const recipeName = claim?.is_suggestion
         ? claim.suggestion_name
@@ -21,6 +23,23 @@ export default function GuestCard({ guest, isCurrentUser, onSelectDish }: GuestC
     const allergens: string[] = claim?.is_suggestion
         ? (claim.suggestion_allergens || [])
         : (claim?.recipe?.allergens || []);
+
+    // Find cooking partners - check own partner_ids AND who listed this person as a partner
+    const partnerNames: string[] = [];
+    if (recipeName) {
+        // People this guest listed as partners
+        const ownPartnerIds = rsvp?.partner_ids || [];
+        // People who listed this guest as their partner
+        const reversePartnerIds = allGuests
+            .filter(g => g.rsvp?.partner_ids?.includes(profile.id) && g.profile.id !== profile.id)
+            .map(g => g.profile.id);
+        // Merge and dedupe
+        const allPartnerIds = Array.from(new Set([...ownPartnerIds, ...reversePartnerIds]));
+        allPartnerIds.forEach(pid => {
+            const p = allProfiles.find(pr => pr.id === pid);
+            if (p) partnerNames.push(p.name);
+        });
+    }
 
     const cardClass = isCurrentUser ? 'guest-card guest-card-you' : 'guest-card';
 
@@ -81,9 +100,21 @@ export default function GuestCard({ guest, isCurrentUser, onSelectDish }: GuestC
             {/* Dish info */}
             {recipeName ? (
                 <div>
-                    <p className="font-body text-sm leading-snug mb-1.5" style={{ color: 'var(--ink)' }}>
+                    <p className="font-body text-sm leading-snug mb-1" style={{ color: 'var(--ink)' }}>
                         {recipeName}
                     </p>
+                    {partnerNames.length > 0 && (
+                        <p className="font-body text-xs mb-1.5" style={{ color: 'var(--accent)' }}>
+                            with {partnerNames.join(' & ')}
+                        </p>
+                    )}
+                    {rsvp?.course_preference && (
+                        <div className="flex flex-wrap gap-2 mb-2 items-center">
+                            <span className="text-[10px] uppercase font-body px-1.5 py-0.5 rounded" style={{ background: 'var(--accent)', color: 'var(--surface)' }}>
+                                {COURSE_LABELS[rsvp.course_preference]}
+                            </span>
+                        </div>
+                    )}
                     {allergens.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                             {allergens.map(allergen => (
