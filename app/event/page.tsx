@@ -25,6 +25,7 @@ export default function EventPage() {
   const [guests, setGuests] = useState<GuestInfo[]>([]);
   const [allProfiles, setAllProfiles] = useState<Profile[]>([]);
   const [declinedGuests, setDeclinedGuests] = useState<{ profile: Profile }[]>([]);
+  const [awaitingGuests, setAwaitingGuests] = useState<{ profile: Profile }[]>([]);
   const [userRsvpStatus, setUserRsvpStatus] = useState<'attending' | 'declined'>('attending');
   const [loading, setLoading] = useState(true);
 
@@ -153,8 +154,14 @@ export default function EventPage() {
       });
     }
 
+    const awaitingList = (allProfilesData || []).filter((p: any) =>
+      !guestList.some(g => g.profile.id === p.id) &&
+      !declinedList.some(g => g.profile.id === p.id)
+    ).map((p: any) => ({ profile: p }));
+
     setGuests(guestList);
     setDeclinedGuests(declinedList);
+    setAwaitingGuests(awaitingList);
     setLoading(false);
   }, [router]);
 
@@ -481,6 +488,44 @@ export default function EventPage() {
                         )}
                       </div>
                       <span className="font-body text-xs" style={{ color: 'var(--accent-warm)' }}>
+                        {g.profile.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Awaiting Reply section */}
+            {awaitingGuests.length > 0 && (
+              <div className="mt-8 pt-6" style={{ borderTop: '1px solid rgba(212, 184, 150, 0.2)' }}>
+                <p className="font-display italic text-sm mb-3" style={{ color: 'var(--accent-warm)' }}>
+                  Awaiting Reply 💭
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {awaitingGuests.map(g => (
+                    <div
+                      key={g.profile.id}
+                      className="flex items-center gap-2 py-1.5 px-3 rounded-full"
+                      style={{
+                        background: 'rgba(212, 184, 150, 0.05)',
+                        border: '1px dashed rgba(212, 184, 150, 0.3)',
+                      }}
+                    >
+                      <div
+                        className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0"
+                        style={{ background: 'var(--surface)', border: '1px solid var(--accent-warm)' }}
+                      >
+                        {g.profile.avatar_url ? (
+                          <img src={g.profile.avatar_url} alt={g.profile.name} className="w-full h-full object-cover grayscale opacity-70" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center font-display italic text-[10px]"
+                            style={{ color: 'var(--accent-warm)' }}>
+                            {g.profile.name?.charAt(0) || '?'}
+                          </div>
+                        )}
+                      </div>
+                      <span className="font-body text-xs" style={{ color: 'var(--accent-warm)', opacity: 0.8 }}>
                         {g.profile.name}
                       </span>
                     </div>
