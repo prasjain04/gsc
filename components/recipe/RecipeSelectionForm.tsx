@@ -2,13 +2,14 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ALLERGEN_EMOJI, COURSE_ORDER, COURSE_LABELS } from '@/lib/types';
+import { ALLERGEN_EMOJI, COURSE_ORDER, COURSE_LABELS, COURSE_QUOTAS } from '@/lib/types';
 import type { RecipeWithClaim, Recipe, Allergen, Course } from '@/lib/types';
 
 interface RecipeSelectionFormProps {
     recipes: RecipeWithClaim[];
     currentClaim?: { claimId: string; recipe?: Recipe; isSuggestion?: boolean; suggestionName?: string } | null;
     isLocked: boolean;
+    courseCounts: Record<Course, number>;
     onClaim: (recipeId: string) => void;
     onUnclaim: (claimId: string) => void;
 }
@@ -17,6 +18,7 @@ export default function RecipeSelectionForm({
     recipes,
     currentClaim,
     isLocked,
+    courseCounts,
     onClaim,
     onUnclaim,
 }: RecipeSelectionFormProps) {
@@ -162,6 +164,25 @@ export default function RecipeSelectionForm({
                         <h3 className="font-display italic text-lg mb-3" style={{ color: 'var(--ink)' }}>
                             Choose a Recipe
                         </h3>
+
+                        {/* Course Distribution Summary */}
+                        <div className="mb-4 p-3 rounded-lg flex flex-wrap gap-x-4 gap-y-2" style={{ background: 'rgba(212, 184, 150, 0.05)' }}>
+                            {COURSE_ORDER.map(course => {
+                                const count = courseCounts[course] || 0;
+                                const quota = COURSE_QUOTAS[course];
+                                return (
+                                    <div key={course} className="flex items-center gap-1.5 text-xs font-body" style={{ color: 'var(--ink)' }}>
+                                        <span className="opacity-80">{COURSE_LABELS[course]}</span>
+                                        <span className="px-1.5 py-0.5 rounded text-[10px]" style={{
+                                            background: count >= quota ? 'var(--accent-warm)' : 'rgba(212, 184, 150, 0.2)',
+                                            color: count >= quota ? 'var(--surface)' : 'inherit'
+                                        }}>
+                                            {count}/{quota}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </div>
 
                         {/* Recipe dropdown */}
                         <div className="mb-4">

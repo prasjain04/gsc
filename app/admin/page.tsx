@@ -385,6 +385,21 @@ export default function AdminPage() {
     setSaving(false);
   };
 
+  const handleRepairDatabase = async () => {
+    setSaving(true);
+    setMessage('Repairing database...');
+    try {
+      const supabase = createBrowserSupabase();
+      await supabase.from('events').update({ is_active: false }).eq('volume_number', 1);
+      await supabase.from('events').delete().gt('volume_number', 2);
+      await supabase.from('events').update({ is_active: true, color_theme: null }).eq('volume_number', 2);
+      setMessage('Database repaired! Refresh the entire app to see the changes.');
+    } catch (err: any) {
+      setMessage('Error repairing DB: ' + err.message);
+    }
+    setSaving(false);
+  };
+
   const handleDeleteRecipe = async (recipeId: string) => {
     const supabase = createBrowserSupabase();
     await supabase.from('recipes').delete().eq('id', recipeId);
@@ -464,13 +479,25 @@ export default function AdminPage() {
               <div className="flex justify-between items-center mb-4">
                 <h2 className="font-display italic text-xl" style={{ color: 'var(--ink)' }}>Event Details</h2>
                 {existingEventId && (
-                  <button
-                    onClick={handleArchiveAndStartNew}
-                    className="px-3 py-1.5 text-xs font-body rounded transition-transform hover:scale-105"
-                    style={{ background: 'var(--accent)', color: 'var(--surface)' }}
-                  >
-                    Archive & Start Next
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleArchiveAndStartNew}
+                      className="px-3 py-1.5 text-xs font-body rounded transition-transform hover:scale-105"
+                      style={{ background: 'var(--accent)', color: 'var(--surface)' }}
+                    >
+                      Archive & Start Next
+                    </button>
+                    {userRole === 'super_admin' && (
+                      <button
+                        onClick={handleRepairDatabase}
+                        disabled={saving}
+                        className="px-3 py-1.5 text-xs font-body rounded transition-transform hover:scale-105 disabled:opacity-50"
+                        style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
+                      >
+                        {saving ? 'Repairing...' : 'Repair DB (Restore Vol 2)'}
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
               <div className="space-y-4" style={{ background: 'var(--surface)', padding: '1.5rem', borderRadius: '8px' }}>

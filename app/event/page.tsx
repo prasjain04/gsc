@@ -437,6 +437,7 @@ export default function EventPage() {
                 isLocked={isLocked}
                 onClaim={handleClaim}
                 onUnclaim={handleUnclaim}
+                courseCounts={courseCounts}
               />
             </div>
 
