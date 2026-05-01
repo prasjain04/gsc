@@ -1,9 +1,9 @@
 // Default theme colors
 export const DEFAULT_THEME = {
-  bg: '#F5F8F5',
-  ink: '#2C3E2F',
-  accent: '#4A6B53',
-  accentWarm: '#8BA892',
+  bg: '#EAF2FB',
+  ink: '#0F2A52',
+  accent: '#1E5BA8',
+  accentWarm: '#6BA3E0',
   surface: '#FFFFFF',
 };
 
