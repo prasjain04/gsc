@@ -171,74 +171,53 @@ export default function EventPage() {
 
   const handleClaim = async (recipeId: string, course: Course, partnerIds: string[]) => {
     if (!userId || !event) return;
-    const supabase = createBrowserSupabase();
 
-    // 1. Delete current user's old claim
-    await supabase.from('claims').delete().eq('event_id', event.id).eq('user_id', userId);
-
-    // 2. Read the existing RSVP to get its id
-    const { data: existingRsvp } = await supabase
-      .from('rsvps')
-      .select('id')
-      .eq('event_id', event.id)
-      .eq('user_id', userId)
-      .maybeSingle();
-
-    if (existingRsvp) {
-      // Update by primary key
-      const { error } = await supabase
-        .from('rsvps')
-        .update({
-          status: 'attending',
-          course_preference: course,
-          partner_ids: partnerIds,
-        })
-        .eq('id', existingRsvp.id);
-      if (error) console.error('RSVP update by id failed:', error);
-    } else {
-      // No RSVP yet — insert
-      const { error } = await supabase.from('rsvps').insert({
-        event_id: event.id,
-        user_id: userId,
-        status: 'attending',
-        course_preference: course,
-        partner_ids: partnerIds,
+    try {
+      const res = await fetch('/api/claim', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventId: event.id,
+          recipeId,
+          userId,
+          course,
+          partnerIds,
+        }),
       });
-      if (error) console.error('RSVP insert failed:', error);
-    }
 
-    // 3. Create claim for current user only (unique index prevents per-recipe duplicates)
-    const { error: claimError } = await supabase.from('claims').insert({
-      event_id: event.id,
-      recipe_id: recipeId,
-      user_id: userId,
-      is_suggestion: false,
-    });
-    if (claimError) console.error('Claim insert failed:', claimError);
+      if (!res.ok) {
+        const data = await res.json();
+        console.error('Claim API error:', data);
+      }
+    } catch (err) {
+      console.error('Claim request failed:', err);
+    }
 
     await loadData();
   };
 
   const handleUnclaim = async (claimId: string) => {
     if (!userId || !event) return;
-    const supabase = createBrowserSupabase();
 
-    // Find the claim
-    const { data: claimData } = await supabase.from('claims').select('*').eq('id', claimId).single();
-    if (claimData) {
-      // Find the user's partners
-      const { data: rsvpData } = await supabase.from('rsvps').select('partner_ids').eq('event_id', event.id).eq('user_id', claimData.user_id).single();
-      const partners = rsvpData?.partner_ids || [];
-      const allUsers = [claimData.user_id, ...partners];
+    try {
+      const res = await fetch('/api/claim', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventId: event.id,
+          claimId,
+        }),
+      });
 
-      for (const uid of allUsers) {
-        await supabase.from('claims').delete().eq('event_id', event.id).eq('user_id', uid);
+      if (!res.ok) {
+        const data = await res.json();
+        console.error('Unclaim API error:', data);
       }
-    } else {
-      await supabase.from('claims').delete().eq('id', claimId);
+    } catch (err) {
+      console.error('Unclaim request failed:', err);
     }
 
-    loadData();
+    await loadData();
   };
 
   const handleToggleRsvp = async () => {
