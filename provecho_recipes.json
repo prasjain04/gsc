@@ -1,0 +1,659 @@
+[
+  {
+    "name": "Pozole Rojo",
+    "page_number": 19,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Pozole Verde",
+    "page_number": 20,
+    "course": "main",
+    "allergens": [
+      "soy",
+      "sesame"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Pipian",
+    "page_number": 23,
+    "course": "main",
+    "allergens": [
+      "nuts"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Sopa de Lentejas",
+    "page_number": 24,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Sopa de Fideo",
+    "page_number": 27,
+    "course": "main",
+    "allergens": [
+      "gluten"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Mushroom Sancocho",
+    "page_number": 28,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Frijoles de la Olla",
+    "page_number": 31,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Instant Pot Frijoles Charros",
+    "page_number": 32,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Frijoles Rojos",
+    "page_number": 35,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Frijoles Colombianos",
+    "page_number": 36,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Spanish Rice",
+    "page_number": 39,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Cilantro Rice",
+    "page_number": 40,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Arroz Amarillo",
+    "page_number": 43,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Corn Tortillas",
+    "page_number": 44,
+    "course": "side",
+    "allergens": [
+      "gluten"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Flour Tortillas",
+    "page_number": 47,
+    "course": "side",
+    "allergens": [
+      "gluten"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "No-Bake Enchiladas Verde with Jackfruit",
+    "page_number": 51,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Colombian Empanadas",
+    "page_number": 52,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Lentil-Cauliflower Empanadas",
+    "page_number": 56,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Mushroom-Spinach Empanadas",
+    "page_number": 59,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Ama’s Tacos Ricos",
+    "page_number": 60,
+    "course": "main",
+    "allergens": [
+      "soy"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Adobo Mushroom Tacos",
+    "page_number": 67,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Shredded Jackfruit Tacos",
+    "page_number": 68,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Sweet Potato and Kale Tacos",
+    "page_number": 71,
+    "course": "main",
+    "allergens": [
+      "soy"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Taquitos de Camote",
+    "page_number": 72,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Quesadillas con Plátanos",
+    "page_number": 75,
+    "course": "main",
+    "allergens": [
+      "gluten"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Quesadillas de Brócoli y Tofu",
+    "page_number": 78,
+    "course": "main",
+    "allergens": [
+      "gluten",
+      "soy"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Quesadillas de Fajitas",
+    "page_number": 81,
+    "course": "main",
+    "allergens": [
+      "gluten"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Papas Chorreadas",
+    "page_number": 82,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Chiles Rellenos",
+    "page_number": 85,
+    "course": "main",
+    "allergens": [
+      "nuts",
+      "gluten"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Hongos a la Diabla",
+    "page_number": 88,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Elote Asado",
+    "page_number": 91,
+    "course": "side",
+    "allergens": [
+      "nuts"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Coliflor Asada",
+    "page_number": 95,
+    "course": "main",
+    "allergens": [
+      "nuts"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Guisado de Papa y Nopales",
+    "page_number": 96,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Guisado de Garbanzos",
+    "page_number": 99,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Jackfruit Tinga Tostadas",
+    "page_number": 100,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Frijoles Fritos",
+    "page_number": 103,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Arroz con Coco",
+    "page_number": 104,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Arepas de Maiz con Aguacate",
+    "page_number": 107,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Vegan Queso Fundido",
+    "page_number": 108,
+    "course": "appetizer",
+    "allergens": [
+      "soy"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Burritos de Desayuno",
+    "page_number": 115,
+    "course": "main",
+    "allergens": [
+      "nuts",
+      "gluten"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "“Huevos” Rancheros",
+    "page_number": 116,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Papas con Chorizo Vegano",
+    "page_number": 119,
+    "course": "main",
+    "allergens": [
+      "soy"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Papas Locas",
+    "page_number": 122,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Chilaquiles Rojos",
+    "page_number": 125,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Chilaquiles Verdes",
+    "page_number": 126,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Gorditas",
+    "page_number": 129,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Tortas de Tofu",
+    "page_number": 130,
+    "course": "main",
+    "allergens": [
+      "gluten",
+      "soy"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Plato Tipico",
+    "page_number": 135,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Mushroom Menudo",
+    "page_number": 139,
+    "course": "main",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Camote y Leche",
+    "page_number": 140,
+    "course": "main",
+    "allergens": [
+      "nuts"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Pico de Gallo",
+    "page_number": 147,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Salsa Verde",
+    "page_number": 148,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Salsa al Horno",
+    "page_number": 151,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Mango Salsa",
+    "page_number": 152,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Avocado Salsa",
+    "page_number": 155,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Aji",
+    "page_number": 156,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Vegan Cilantro Crema",
+    "page_number": 159,
+    "course": "side",
+    "allergens": [
+      "nuts"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Vegan Chipotle Crema",
+    "page_number": 160,
+    "course": "side",
+    "allergens": [
+      "nuts"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Fermented Vegan Crema",
+    "page_number": 163,
+    "course": "side",
+    "allergens": [
+      "nuts"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Vegan Queso Fresco",
+    "page_number": 164,
+    "course": "side",
+    "allergens": [
+      "soy"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Mi Tia Evelia’s Ceviche de Coliflor",
+    "page_number": 167,
+    "course": "appetizer",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Coconut Aguachile",
+    "page_number": 170,
+    "course": "appetizer",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Curtido",
+    "page_number": 174,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Ensalada de Nopales",
+    "page_number": 177,
+    "course": "side",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Mexican Potato Salad",
+    "page_number": 178,
+    "course": "side",
+    "allergens": [
+      "soy"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Colada de Plátanos",
+    "page_number": 219,
+    "course": "dessert",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Almond Milk Rice Pudding with Cashew Cream",
+    "page_number": 220,
+    "course": "dessert",
+    "allergens": [
+      "nuts"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Gelatina de Mango Coco",
+    "page_number": 223,
+    "course": "dessert",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Edgar’s No-Bake Mexican Cheesecake",
+    "page_number": 227,
+    "course": "dessert",
+    "allergens": [
+      "nuts",
+      "gluten",
+      "soy"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Galletas de Almendras",
+    "page_number": 231,
+    "course": "dessert",
+    "allergens": [
+      "nuts"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Galletas de Jengibre",
+    "page_number": 232,
+    "course": "dessert",
+    "allergens": [],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Sweet Potato Empanadas",
+    "page_number": 235,
+    "course": "dessert",
+    "allergens": [
+      "gluten"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Apple Empanadas",
+    "page_number": 238,
+    "course": "dessert",
+    "allergens": [
+      "gluten"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  },
+  {
+    "name": "Pastelitos",
+    "page_number": 241,
+    "course": "dessert",
+    "allergens": [
+      "nuts"
+    ],
+    "is_vegetarian": true,
+    "is_vegan": true
+  }
+]

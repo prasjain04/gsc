@@ -30,18 +30,17 @@ export async function POST(request: NextRequest) {
       await supabase.from('claims').delete().eq('event_id', eventId).eq('user_id', uid);
     }
 
-    // 2. Create claims for the primary user AND all partners
-    const claimInserts = allUserIds.map(uid => ({
-      event_id: eventId,
-      recipe_id: recipeId,
-      user_id: uid,
-      is_suggestion: false,
-    }));
-
-    const { error: claimError } = await supabase.from('claims').insert(claimInserts);
-    if (claimError) {
-      console.error('Claim insert failed:', claimError);
-      return NextResponse.json({ error: 'Failed to create claims', details: claimError.message }, { status: 500 });
+    // 2. Create claims for the primary user AND all partners (one at a time to handle constraints)
+    for (const uid of allUserIds) {
+      const { error: claimError } = await supabase.from('claims').insert({
+        event_id: eventId,
+        recipe_id: recipeId,
+        user_id: uid,
+        is_suggestion: false,
+      });
+      if (claimError) {
+        console.error(`Claim insert failed for user ${uid}:`, claimError);
+      }
     }
 
     // 3. Update/upsert RSVPs for primary user and all partners
