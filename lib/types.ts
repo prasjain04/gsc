@@ -6,7 +6,7 @@ export type RSVPStatus = 'attending' | 'declined';
 
 export type Course = 'appetizer' | 'main' | 'side' | 'dessert';
 
-export type Allergen = 'nuts' | 'dairy' | 'gluten' | 'eggs' | 'shellfish' | 'soy';
+export type Allergen = 'nuts' | 'dairy' | 'gluten' | 'eggs' | 'shellfish' | 'soy' | 'sesame';
 
 export interface Profile {
   id: string;
@@ -118,6 +118,7 @@ export const ALLERGEN_EMOJI: Record<Allergen, string> = {
   eggs: '🍳',
   shellfish: '🦐',
   soy: '🫘',
+  sesame: '🫓',
 };
 
 export const COURSE_ORDER: Course[] = ['appetizer', 'main', 'side', 'dessert'];

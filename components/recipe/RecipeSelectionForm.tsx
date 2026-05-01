@@ -120,7 +120,7 @@ export default function RecipeSelectionForm({
     const LEGEND_ITEMS = [
         ['🥜', 'Nuts'], ['🥛', 'Dairy'], ['🌾', 'Gluten'],
         ['🍳', 'Eggs'], ['🦐', 'Shellfish'], ['🫘', 'Soy'],
-        ['🥦', 'Veg'], ['🌱', 'Vegan'],
+        ['🫓', 'Sesame'], ['🥦', 'Veg'], ['🌱', 'Vegan'],
     ] as const;
 
     return (
