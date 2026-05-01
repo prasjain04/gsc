@@ -224,7 +224,7 @@ export default function AdminPage() {
       const data = JSON.parse(text);
       if (!Array.isArray(data)) { setParseError('JSON must be an array of recipes'); return; }
       const validCourses = ['appetizer', 'main', 'side', 'dessert'];
-      const validAllergens = ['nuts', 'dairy', 'gluten', 'eggs', 'shellfish', 'soy'];
+      const validAllergens = ['nuts', 'dairy', 'gluten', 'eggs', 'shellfish', 'soy', 'sesame'];
       for (let i = 0; i < data.length; i++) {
         const r = data[i];
         if (!r.name) { setParseError(`Recipe #${i + 1} missing "name"`); return; }
