@@ -97,34 +97,34 @@ export default function Envelope({ children, onOpen }: EnvelopeProps) {
           style={{ zIndex: 10, willChange: 'opacity' }}
         >
           <div className="absolute inset-0" style={{
-            background: '#E8E0D4',
+            background: '#D4DEE8',
             borderRadius: '4px 4px 8px 8px',
             boxShadow: '0 8px 30px rgba(0,0,0,0.10)',
           }} />
 
           <div className="absolute inset-x-0 top-0" style={{
-            height: '55%', background: '#F5F0E8',
+            height: '55%', background: '#E0E9F5',
             clipPath: 'polygon(0 0, 50% 80%, 100% 0)',
           }} />
 
           <div className="absolute top-0 left-0 bottom-0" style={{
-            width: '12%', background: 'linear-gradient(90deg, #DFD7CB, #E8E0D4)',
+            width: '12%', background: 'linear-gradient(90deg, #CBD5DF, #D4DEE8)',
             clipPath: 'polygon(0 0, 100% 12%, 100% 88%, 0 100%)', borderRadius: '4px 0 0 8px',
           }} />
 
           <div className="absolute top-0 right-0 bottom-0" style={{
-            width: '12%', background: 'linear-gradient(270deg, #DFD7CB, #E8E0D4)',
+            width: '12%', background: 'linear-gradient(270deg, #CBD5DF, #D4DEE8)',
             clipPath: 'polygon(0 12%, 100% 0, 100% 100%, 0 88%)', borderRadius: '0 4px 8px 0',
           }} />
 
           <div className="absolute inset-0" style={{
-            background: 'linear-gradient(180deg, #F0E8DC 0%, #E8E0D4 100%)',
+            background: 'linear-gradient(180deg, #DCE6F0 0%, #D4DEE8 100%)',
             clipPath: 'polygon(0 0, 50% 45%, 100% 0, 100% 100%, 0 100%)',
             borderRadius: '0 0 8px 8px',
           }} />
 
           <div className="absolute bottom-0 inset-x-0" style={{
-            height: '18%', background: 'linear-gradient(0deg, #E0D8CC, transparent)',
+            height: '18%', background: 'linear-gradient(0deg, #CCD6E0, transparent)',
             borderRadius: '0 0 8px 8px',
           }} />
 
@@ -136,7 +136,7 @@ export default function Envelope({ children, onOpen }: EnvelopeProps) {
             initial={{ rotateX: 0 }}
           >
             <div className="w-full h-full" style={{
-              background: 'linear-gradient(180deg, #EDE6DA 0%, #E4DCD0 100%)',
+              background: 'linear-gradient(180deg, #DAE4ED 0%, #D0DCE4 100%)',
               clipPath: 'polygon(0 0, 50% 100%, 100% 0)',
               backfaceVisibility: 'hidden',
             }} />
@@ -151,9 +151,9 @@ export default function Envelope({ children, onOpen }: EnvelopeProps) {
           >
             <div className="relative w-14 h-14 flex items-center justify-center">
               <div className="absolute inset-0" style={{
-                background: 'radial-gradient(circle at 40% 35%, #5B9A6B 0%, #4A7C59 40%, #3D6A4B 100%)',
+                background: 'radial-gradient(circle at 40% 35%, #3A7DC8 0%, #1E5BA8 40%, #174A8A 100%)',
                 borderRadius: '47% 53% 52% 48% / 49% 45% 55% 51%',
-                boxShadow: '0 3px 8px rgba(74, 124, 89, 0.4), inset 0 1px 2px rgba(255,255,255,0.15)',
+                boxShadow: '0 3px 8px rgba(30, 91, 168, 0.4), inset 0 1px 2px rgba(255,255,255,0.15)',
               }} />
               <div className="absolute" style={{
                 inset: '6px', border: '1.5px solid rgba(255,255,255,0.2)', borderRadius: '50%',
